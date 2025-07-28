@@ -15,11 +15,13 @@ import com.branwen.mal.ui.theme.BranwenMALTheme
 import com.branwen.mal.utils.AppNavigation
 import com.branwen.mal.utils.PKCE
 import com.google.gson.annotations.SerializedName
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
 

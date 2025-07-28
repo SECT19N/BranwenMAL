@@ -4,6 +4,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
 
 val key: String = gradleLocalProperties(rootDir, providers).getProperty("clientId")
@@ -49,6 +52,11 @@ android {
 }
 
 dependencies {
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    ksp(libs.hilt.android.compiler)
+
+    implementation(libs.timber)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)

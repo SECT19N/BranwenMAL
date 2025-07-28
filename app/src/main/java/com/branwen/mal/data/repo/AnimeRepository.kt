@@ -2,9 +2,11 @@ package com.branwen.mal.data.repo
 
 import android.content.SharedPreferences
 import com.branwen.mal.models.AnimeListItem
+import com.branwen.mal.models.AnimeNode
+import com.branwen.mal.models.Picture
 import com.branwen.mal.utils.MalServiceBuilder
 
-class AnimeListRepository(
+class AnimeRepository(
     private val sharedPreferences: SharedPreferences
 ) {
     private val statusOrder = listOf(
@@ -26,5 +28,15 @@ class AnimeListRepository(
         return response.data.sortedBy {
             statusOrder[it.listStatus?.status] ?: Int.MAX_VALUE
         }
+    }
+
+    suspend fun getAnimeDetails(animeId: Int): AnimeNode {
+        val accessToken = sharedPreferences.getString("access_token", null)
+            ?: return AnimeNode(0, "", Picture("", ""))
+
+        val apiService = MalServiceBuilder.provideMalApiService(accessToken)
+        val response = apiService.getAnimeDetails(animeId)
+
+        return response
     }
 }

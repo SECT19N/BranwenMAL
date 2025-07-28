@@ -1,43 +1,72 @@
 package com.branwen.mal.viewmodels
 
-import android.app.Application
-import android.content.Context.MODE_PRIVATE
+import android.content.Context
+import android.content.Intent
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.net.toUri
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.branwen.mal.data.repo.AnimeRepository
 import com.branwen.mal.models.AnimeNode
-import com.branwen.mal.utils.MalServiceBuilder.provideMalApiService
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import javax.inject.Inject
 
-class AnimeDetailsViewModel(
-    application: Application,
-    private val animeId: Int
-) : AndroidViewModel(application) {
-    private val _animeDetails = MutableLiveData<AnimeNode>()
+@HiltViewModel
+class AnimeDetailsViewModel @Inject constructor(
+    private val repo: AnimeRepository,
+    savedStateHandle: SavedStateHandle
+) : ViewModel() {
 
-    val animeDetails: LiveData<AnimeNode> = _animeDetails
-
-    init {
-        loadAnimeDetails(animeId)
+    private val animeId: Int = checkNotNull(savedStateHandle["animeId"]) {
+        "Missing animeId argument"
     }
 
-    fun loadAnimeDetails(animeId: Int) {
-        viewModelScope.launch {
-            val context = getApplication<Application>().applicationContext
-            val prefs = context.getSharedPreferences("bran_mal_prefs", MODE_PRIVATE)
-            val accessToken = prefs.getString("access_token", null)
+    private val _animeDetails = MutableStateFlow<AnimeNode?>(null)
+    val animeDetails: StateFlow<AnimeNode?> = _animeDetails
 
-            if (accessToken != null) {
-                try {
-                    val apiService = provideMalApiService(accessToken)
-                    val response = apiService.getAnimeDetails(animeId)
-                    _animeDetails.value = response
-                } catch (e: Exception) {
-                    Log.e("AnimeDetailsViewModel", "Error loading anime details ${e.message}", e)
-                }
+    init {
+        loadAnimeDetails()
+    }
+
+    fun loadAnimeDetails() {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                repo.getAnimeDetails(animeId)
+            }.onSuccess { details ->
+                _animeDetails.value = details
+                Timber.d("Loaded anime details for id=$animeId")
+            }.onFailure { error ->
+                Timber.e(error, "Failed to load anime details for id=$animeId")
             }
+        }
+    }
+
+    fun shareAnime(context: Context) {
+        val url = "https://myanimelist.net/anime/$animeId"
+        Timber.i("Sharing anime URL: $url")
+        Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_TEXT, url)
+            type = "text/plain"
+        }.also {
+            context.startActivity(Intent.createChooser(it, null))
+        }
+    }
+
+    fun openGenreLink(context: Context, genreId: Int) {
+        val url = "https://myanimelist.net/anime/genre/$genreId"
+        runCatching {
+            Timber.i("Opening genre link: $url")
+            CustomTabsIntent.Builder().build()
+                .launchUrl(context, url.toUri())
+        }.onFailure {
+            Timber.e(it,"Error opening genre link: $url")
         }
     }
 }

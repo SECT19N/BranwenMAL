@@ -3,22 +3,34 @@ package com.branwen.mal.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.branwen.mal.data.repo.AnimeListRepository
+import com.branwen.mal.data.repo.AnimeRepository
 import com.branwen.mal.models.AnimeListItem
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MyListViewModel(
-    private val repository: AnimeListRepository
+data class MyListUiState(
+    val animeList: List<AnimeListItem> = emptyList(),
+    val selectedStatus: String = "all",
+    val filteredAnimeList: List<AnimeListItem> = emptyList()
+)
+
+@HiltViewModel
+class MyListViewModel @Inject constructor(
+    private val repository: AnimeRepository,
 ) : ViewModel() {
+    private val _uiState = MutableStateFlow(MyListUiState())
+    val uiState: StateFlow<MyListUiState> = _uiState.asStateFlow()
+
     private val _animeList = MutableStateFlow<List<AnimeListItem>>(emptyList())
     val animeList: StateFlow<List<AnimeListItem>> = _animeList
-
 
     private val _selectedStatus = MutableStateFlow("all")
     val selectedStatus: StateFlow<String> = _selectedStatus
@@ -31,7 +43,9 @@ class MyListViewModel(
         } else {
             fullList.filter { it.listStatus?.status == status }
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    }.stateIn(
+        scope = viewModelScope, started = SharingStarted.WhileSubscribed(), initialValue = emptyList()
+    )
 
     init {
         fetchAnimeList()
@@ -40,18 +54,30 @@ class MyListViewModel(
     fun refreshAnimeList() {
         fetchAnimeList(forceRefresh = true)
     }
+//
+//    private fun fetchAnimeList(forceRefresh: Boolean = false) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            runCatching {
+//                _animeList.value = repository.getAnimeList()
+//            }.onFailure {
+//                Log.e("MyListViewModel", "Error fetching anime list", it)
+//            }
+//        }
+//    }
 
-    private fun fetchAnimeList(forceRefresh: Boolean = false) {
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                _animeList.value = repository.getAnimeList()
-            }.onFailure {
-                Log.e("MyListViewModel", "Error fetching anime list", it)
-            }
-        }
+    private fun fetchAnimeList(forceRefresh: Boolean = false) = launchCatching {
+        _animeList.value = repository.getAnimeList()
     }
 
     fun onStatusSelected(status: String) {
         _selectedStatus.value = status
+    }
+}
+
+fun ViewModel.launchCatching(block: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+    runCatching {
+        block()
+    }.onFailure {
+        Log.e("", "", it)
     }
 }

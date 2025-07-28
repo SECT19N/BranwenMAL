@@ -1,6 +1,7 @@
 package com.branwen.mal.components
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,11 +37,19 @@ import com.branwen.mal.models.AnimeListItem
 
 @Composable
 fun ListItem(
-    animeItem: AnimeListItem
+    animeItem: AnimeListItem,
+    onItemClicked: (Int) -> Unit
 ) {
     val borderColor = statusToColor(animeItem.listStatus?.status ?: "plan_to_watch")
 
-    Card {
+    Card(
+        modifier = Modifier
+            .clickable(
+                onClick = {
+                    onItemClicked(animeItem.node.id)
+                }
+            )
+    ) {
         Row(
             modifier = Modifier
                 .height(164.dp)

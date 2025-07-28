@@ -63,6 +63,14 @@ data class Status(
     @Json(name = "plan_to_watch") val planToWatch: String? = null
 )
 
+fun Status.toIntMap(): Map<String, Int> = mapOf(
+    "Watching" to (watching?.toIntOrNull() ?: 0),
+    "Completed" to (completed?.toIntOrNull() ?: 0),
+    "On Hold" to (onHold?.toIntOrNull() ?: 0),
+    "Dropped" to (dropped?.toIntOrNull() ?: 0),
+    "Plan to Watch" to (planToWatch?.toIntOrNull() ?: 0)
+)
+
 data class Studio(
     val id: Int,
     val name: String

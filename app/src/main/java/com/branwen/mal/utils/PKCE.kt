@@ -6,7 +6,7 @@ import java.security.SecureRandom
 object PKCE {
     var codeVerifier: String? = null
 
-    fun generateCodeVerifier(): Unit {
+    fun generateCodeVerifier() {
         val random = SecureRandom()
         val bytes = ByteArray(43)
         random.nextBytes(bytes)
