@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.branwen.mal.data.repo.AnimeRepository
+import com.branwen.mal.data.repo.MyAnimeListItem
 import com.branwen.mal.models.AnimeListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -30,19 +31,19 @@ class MyListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(MyListUiState())
     val uiState: StateFlow<MyListUiState> = _uiState.asStateFlow()
 
-    private val _animeList = MutableStateFlow<List<AnimeListItem>>(emptyList())
-    val animeList: StateFlow<List<AnimeListItem>> = _animeList
+    private val _animeList = MutableStateFlow<List<MyAnimeListItem>>(emptyList())
+    val animeList: StateFlow<List<MyAnimeListItem>> = _animeList
 
     private val _selectedStatus = MutableStateFlow("all")
     val selectedStatus: StateFlow<String> = _selectedStatus
 
-    val filteredAnimeList: StateFlow<List<AnimeListItem>> = combine(
+    val filteredAnimeList: StateFlow<List<MyAnimeListItem>> = combine(
         _animeList, _selectedStatus
     ) { fullList, status ->
         if (status == "all") {
             fullList
         } else {
-            fullList.filter { it.listStatus?.status == status }
+            fullList.filter { it.status == status }
         }
     }.stateIn(
         scope = viewModelScope, started = SharingStarted.WhileSubscribed(), initialValue = emptyList()

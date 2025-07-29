@@ -68,18 +68,15 @@ fun MyListScreen(
                         checkedState = it
                     },
                     thumbContent = {
-                        if (checkedState) {
-                            Text("A")
-                        } else {
-                            Text("M")
-                        }
+                        Text(
+                            text = if (checkedState) "A" else "M"
+                        )
                     },
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 0.dp)
                 )
             },
             modifier = Modifier
         )
-
 
         StatusFilterChips(
             selectedStatus = selectedStatus,
@@ -96,7 +93,7 @@ fun MyListScreen(
                 .fillMaxSize()
         ) {
             items(filteredAnimeList) { item ->
-                ListItem(animeItem = item, onItemClicked = { navigate(item.node.id) })
+                ListItem(animeItem = item, onItemClicked = { navigate(item.id) })
             }
         }
     }

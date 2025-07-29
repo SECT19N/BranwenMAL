@@ -5,12 +5,13 @@ import com.branwen.mal.models.AnimeListItem
 import com.branwen.mal.models.AnimeNode
 import com.branwen.mal.models.Picture
 import com.branwen.mal.models.toIntMap
+import com.branwen.mal.screens.MyListScreen
 import com.branwen.mal.utils.MalServiceBuilder
 
 class AnimeRepository(
     private val remote: AnimeRemoteDataSource, private val local: AnimeLocalDataSource
 ) {
-    suspend fun getAnimeList(): List<AnimeListItem> {
+    suspend fun getAnimeList(): List<MyAnimeListItem> {
         return runCatching {
             remote.getAnimeList()
         }.onSuccess {
@@ -37,11 +38,11 @@ class AnimeRemoteDataSource(
     private val statusOrder = listOf("watching", "completed", "on_hold", "dropped", "plan_to_watch").withIndex()
         .associate { it.value to it.index }
 
-    suspend fun getAnimeList(): List<AnimeListItem> {
+    suspend fun getAnimeList(): List<MyAnimeListItem> {
         val token = sharedPreferences.getString("access_token", null) ?: return emptyList()
         val service = MalServiceBuilder.provideMalApiService(token)
         val response = service.getUserAnimeList(limit = 1000, offset = 0)
-        return response.data.sortedBy { statusOrder[it.listStatus?.status] ?: Int.MAX_VALUE }
+        return response.data.sortedBy { statusOrder[it.listStatus?.status] ?: Int.MAX_VALUE }.toDomain()
     }
 
     suspend fun getAnimeDetails(animeId: Int): AnimeNode {
@@ -53,6 +54,24 @@ class AnimeRemoteDataSource(
             )
 
         return MalServiceBuilder.provideMalApiService(token).getAnimeDetails(animeId)
+    }
+
+    private fun List<AnimeListItem>.toDomain(): List<MyAnimeListItem> {
+        return map { it.toDomain() }
+    }
+
+    private fun AnimeListItem.toDomain(): MyAnimeListItem {
+        return MyAnimeListItem(
+            id = node.id,
+            title = node.title,
+            status = listStatus?.status ?: "plan_to_watch",
+            imageUrl = node.mainPicture.medium,
+            startSeason = node.startSeason.season.replaceFirstChar { it.uppercaseChar() },
+            startYear = node.startSeason.year.toString(),
+            numEpisodesWatched = listStatus?.numEpisodesWatched ?: 0,
+            totalEpisodes = node.numEpisodes,
+            rating = listStatus?.score ?: 0
+        )
     }
 
     private fun AnimeNode.toDomain(): Anime {
@@ -76,12 +95,24 @@ class AnimeRemoteDataSource(
 }
 
 class AnimeLocalDataSource { //placeholder
-    suspend fun getAnimeList(): List<AnimeListItem> = emptyList()
-    suspend fun saveAnimeList(list: List<AnimeListItem>) = Unit
+    suspend fun getAnimeList(): List<MyAnimeListItem> = emptyList()
+    suspend fun saveAnimeList(list: List<MyAnimeListItem>) = Unit
 
     suspend fun getAnimeDetails(animeId: Int): AnimeNode? = null
     suspend fun saveAnimeDetails(node: AnimeNode) = Unit
 }
+
+data class MyAnimeListItem(
+    val id: Int,
+    val title: String,
+    val status: String,
+    val imageUrl: String,
+    val startSeason: String,
+    val startYear: String,
+    val numEpisodesWatched: Int,
+    val totalEpisodes: Int?,
+    val rating: Int
+)
 
 data class Anime(
     val id: Int,

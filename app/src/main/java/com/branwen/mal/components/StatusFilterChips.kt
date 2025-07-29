@@ -22,7 +22,7 @@ fun StatusFilterChips(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp, 8.dp)
+            .padding(8.dp, 4.dp)
     ) {
         items(statuses) { status ->
             FilterChip(

@@ -2,6 +2,7 @@ package com.branwen.mal.models
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import java.util.Date
 
 @JsonClass(generateAdapter = true)
 data class AnimeListResponse(
