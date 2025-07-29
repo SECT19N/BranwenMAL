@@ -2,7 +2,6 @@ package com.branwen.mal.viewmodels
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
@@ -23,13 +22,12 @@ class AnimeDetailsViewModel @Inject constructor(
     private val repo: AnimeRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
     private val animeId: Int = checkNotNull(savedStateHandle["animeId"]) {
         "Missing animeId argument"
     }
 
-    private val _animeDetails = MutableStateFlow<AnimeNode?>(null)
-    val animeDetails: StateFlow<AnimeNode?> = _animeDetails
+    private val _uiModel = MutableStateFlow<AnimeNode?>(null)
+    val uiModel: StateFlow<AnimeNode?> = _uiModel
 
     init {
         loadAnimeDetails()
@@ -39,11 +37,11 @@ class AnimeDetailsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 repo.getAnimeDetails(animeId)
-            }.onSuccess { details ->
-                _animeDetails.value = details
-                Timber.d("Loaded anime details for id=$animeId")
-            }.onFailure { error ->
-                Timber.e(error, "Failed to load anime details for id=$animeId")
+            }.onSuccess { node ->
+                _uiModel.value = node
+                Timber.d("Loaded details for id=${node.id}")
+            }.onFailure { e ->
+                Timber.e(e, "Failed loading anime details for id=$animeId")
             }
         }
     }
@@ -66,7 +64,7 @@ class AnimeDetailsViewModel @Inject constructor(
             CustomTabsIntent.Builder().build()
                 .launchUrl(context, url.toUri())
         }.onFailure {
-            Timber.e(it,"Error opening genre link: $url")
+            Timber.e(it, "Error opening genre link: $url")
         }
     }
 }

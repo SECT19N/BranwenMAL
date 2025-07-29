@@ -1,5 +1,6 @@
 package com.branwen.mal.screens
 
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -22,10 +23,12 @@ fun MainScreen() {
         Scaffold(
             bottomBar = {
                 BottomNavigationBar(navController)
-            },
+            }
         ) { innerPadding ->
             NavHost(
-                modifier = Modifier.padding(innerPadding),
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding),
                 navController = navController,
                 startDestination = "home"
             ) {

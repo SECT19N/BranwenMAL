@@ -1,6 +1,6 @@
 package com.branwen.mal.viewmodels
 
-import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.branwen.mal.data.repo.AnimeRepository
@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 data class MyListUiState(
@@ -47,6 +48,9 @@ class MyListViewModel @Inject constructor(
         scope = viewModelScope, started = SharingStarted.WhileSubscribed(), initialValue = emptyList()
     )
 
+    private val _listSwitchChecked = mutableStateOf(true)
+    val listSwitchChecked = _listSwitchChecked
+
     init {
         fetchAnimeList()
     }
@@ -78,6 +82,6 @@ fun ViewModel.launchCatching(block: suspend () -> Unit) = viewModelScope.launch(
     runCatching {
         block()
     }.onFailure {
-        Log.e("", "", it)
+        Timber.e(it, "Error in launchCatching")
     }
 }

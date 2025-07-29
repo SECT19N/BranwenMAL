@@ -1,7 +1,6 @@
 package com.branwen.mal.components
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +15,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -43,18 +43,23 @@ fun ListItem(
     val borderColor = statusToColor(animeItem.listStatus?.status ?: "plan_to_watch")
 
     Card(
+        shape = RoundedCornerShape(12.dp),
+        onClick = { onItemClicked(animeItem.node.id) },
         modifier = Modifier
-            .clickable(
-                onClick = {
-                    onItemClicked(animeItem.node.id)
-                }
-            )
+            .fillMaxWidth()
+            .height(164.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp,
+            pressedElevation = 4.dp,
+            hoveredElevation = 3.dp,
+            focusedElevation = 4.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        )
     ) {
-        Row(
-            modifier = Modifier
-                .height(164.dp)
-                .fillMaxWidth(),
-        ) {
+        Row {
             Column(
                 modifier = Modifier
                     .clip(

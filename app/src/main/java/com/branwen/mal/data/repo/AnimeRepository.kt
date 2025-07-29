@@ -4,39 +4,111 @@ import android.content.SharedPreferences
 import com.branwen.mal.models.AnimeListItem
 import com.branwen.mal.models.AnimeNode
 import com.branwen.mal.models.Picture
+import com.branwen.mal.models.toIntMap
 import com.branwen.mal.utils.MalServiceBuilder
 
 class AnimeRepository(
-    private val sharedPreferences: SharedPreferences
+    private val remote: AnimeRemoteDataSource, private val local: AnimeLocalDataSource
 ) {
-    private val statusOrder = listOf(
-        "watching",
-        "completed",
-        "on_hold",
-        "dropped",
-        "plan_to_watch"
-    ).withIndex().associate { it.value to it.index }
-
     suspend fun getAnimeList(): List<AnimeListItem> {
-        val accessToken = sharedPreferences.getString("access_token", null)
-            ?: return emptyList()
-
-        val apiService = MalServiceBuilder.provideMalApiService(accessToken)
-        val response =
-            apiService.getUserAnimeList(limit = 1000, offset = 0) //TODO - add logic to load 100 at a time later on
-
-        return response.data.sortedBy {
-            statusOrder[it.listStatus?.status] ?: Int.MAX_VALUE
+        return runCatching {
+            remote.getAnimeList()
+        }.onSuccess {
+            local.saveAnimeList(it)
+        }.getOrElse {
+            local.getAnimeList()
         }
     }
 
     suspend fun getAnimeDetails(animeId: Int): AnimeNode {
-        val accessToken = sharedPreferences.getString("access_token", null)
-            ?: return AnimeNode(0, "", Picture("", ""))
-
-        val apiService = MalServiceBuilder.provideMalApiService(accessToken)
-        val response = apiService.getAnimeDetails(animeId)
-
-        return response
+        return runCatching {
+            remote.getAnimeDetails(animeId)
+        }.onSuccess {
+            local.saveAnimeDetails(it)
+        }.getOrElse {
+            local.getAnimeDetails(animeId) ?: error("No details cached")
+        }
     }
 }
+
+class AnimeRemoteDataSource(
+    private val sharedPreferences: SharedPreferences
+) {
+    private val statusOrder = listOf("watching", "completed", "on_hold", "dropped", "plan_to_watch").withIndex()
+        .associate { it.value to it.index }
+
+    suspend fun getAnimeList(): List<AnimeListItem> {
+        val token = sharedPreferences.getString("access_token", null) ?: return emptyList()
+        val service = MalServiceBuilder.provideMalApiService(token)
+        val response = service.getUserAnimeList(limit = 1000, offset = 0)
+        return response.data.sortedBy { statusOrder[it.listStatus?.status] ?: Int.MAX_VALUE }
+    }
+
+    suspend fun getAnimeDetails(animeId: Int): AnimeNode {
+        val token = sharedPreferences.getString("access_token", null)
+            ?: return AnimeNode(
+                id = animeId,
+                title = "N/A",
+                mainPicture = Picture("N/A", "N/A")
+            )
+
+        return MalServiceBuilder.provideMalApiService(token).getAnimeDetails(animeId)
+    }
+
+    private fun AnimeNode.toDomain(): Anime {
+        return Anime(
+            id = id,
+            title = title,
+            posterUrl = mainPicture.large,
+            membersCount = numListUsers,
+            rank = rank,
+            popularityRank = popularity,
+            mediaType = mediaType,
+            year = startSeason.year,
+            status = status,
+            episodes = numEpisodes,
+            episodeDurationMinutes = averageEpisodeDuration?.div(60),
+            genres = genres?.map { Genre(it.id, it.name) } ?: emptyList(),
+            synopsis = synopsis,
+            statusStats = statistics?.status?.toIntMap() ?: emptyMap()
+        )
+    }
+}
+
+class AnimeLocalDataSource { //placeholder
+    suspend fun getAnimeList(): List<AnimeListItem> = emptyList()
+    suspend fun saveAnimeList(list: List<AnimeListItem>) = Unit
+
+    suspend fun getAnimeDetails(animeId: Int): AnimeNode? = null
+    suspend fun saveAnimeDetails(node: AnimeNode) = Unit
+}
+
+data class Anime(
+    val id: Int,
+    val title: String,
+    val posterUrl: String?,
+    val membersCount: Int?,
+    val rank: Int?,
+    val popularityRank: Int?,
+    val mediaType: String?,
+    val year: Int?,
+    val status: String?,
+    val episodes: Int?,
+    val episodeDurationMinutes: Int?,
+    val genres: List<Genre>,
+    val synopsis: String?,
+    val statusStats: Map<String, Int>
+)
+
+data class Genre(val id: Int, val name: String)
+
+data class AnimeDetailsUiModel(
+    val title: String,
+    val posterUrl: String?,
+    val summaryLine: String,
+    val genres: List<GenreUi>,
+    val synopsis: String,
+    val chartData: Map<String, Int>
+)
+
+data class GenreUi(val id: Int, val name: String)
