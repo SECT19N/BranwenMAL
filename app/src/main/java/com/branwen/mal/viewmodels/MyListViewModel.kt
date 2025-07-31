@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -66,7 +67,9 @@ class MyListViewModel @Inject constructor(
         launchCatching(
             block = {
                 if (isInitial) _loading.value = true
-                _animeList.value = repository.getAnimeList()
+                repository.getAnimeListFlow().take(1).collect { list ->
+                    _animeList.value = list
+                }
             },
             post = {
                 if (isInitial) _loading.value = false

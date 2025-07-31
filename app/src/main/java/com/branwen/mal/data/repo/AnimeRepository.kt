@@ -1,21 +1,33 @@
 package com.branwen.mal.data.repo
 
 import android.content.SharedPreferences
+import androidx.room.Dao
+import androidx.room.Entity
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.PrimaryKey
+import androidx.room.Query
 import com.branwen.mal.models.AnimeListItem
 import com.branwen.mal.models.AnimeNode
 import com.branwen.mal.models.Picture
 import com.branwen.mal.utils.MalServiceBuilder
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
 class AnimeRepository(
-    private val remote: AnimeRemoteDataSource, private val local: AnimeLocalDataSource
+    private val remote: AnimeRemoteDataSource,
+    private val local: AnimeLocalDataSource
 ) {
-    suspend fun getAnimeList(): List<MyAnimeListItem> {
-        return runCatching {
-            remote.getAnimeList()
-        }.onSuccess {
-            local.saveAnimeList(it)
-        }.getOrElse {
-            local.getAnimeList()
+    fun getAnimeListFlow(): Flow<List<MyAnimeListItem>> = flow {
+        val localFlow = local.getAnimeListFlow().firstOrNull()
+        emitAll(local.getAnimeListFlow()) // always observe local
+
+        if (localFlow.isNullOrEmpty()) {
+            val remoteList = remote.getAnimeList()
+            local.saveAnimeList(remoteList)
         }
     }
 
@@ -92,12 +104,46 @@ class AnimeRemoteDataSource(
     }
 }
 
-class AnimeLocalDataSource { //placeholder
-    suspend fun getAnimeList(): List<MyAnimeListItem> = emptyList()
-    suspend fun saveAnimeList(list: List<MyAnimeListItem>) = Unit
+class AnimeLocalDataSource(private val dao: AnimeDao) {
+    fun getAnimeListFlow(): Flow<List<MyAnimeListItem>> =
+        dao.getAll()
+            .map { entities ->
+                entities.map { it.toDomain() }
+            }
+
+    suspend fun saveAnimeList(list: List<MyAnimeListItem>) {
+        dao.clearAll()
+        dao.insertAll(
+            list = list.map { it.toEntity() }
+        )
+    }
 
     suspend fun getAnimeDetails(animeId: Int): AnimeNode? = null
     suspend fun saveAnimeDetails(node: AnimeNode) = Unit
+
+    private fun AnimeListEntity.toDomain() = MyAnimeListItem(
+        id = id,
+        title = title,
+        status = status,
+        imageUrl = imageUrl,
+        startSeason = startSeason,
+        startYear = startYear,
+        numEpisodesWatched = numEpisodesWatched,
+        totalEpisodes = totalEpisodes,
+        rating = rating
+    )
+
+    private fun MyAnimeListItem.toEntity() = AnimeListEntity(
+        id = id,
+        title = title,
+        status = status,
+        imageUrl = imageUrl,
+        startSeason = startSeason,
+        startYear = startYear,
+        numEpisodesWatched = numEpisodesWatched,
+        totalEpisodes = totalEpisodes,
+        rating = rating
+    )
 }
 
 data class MyAnimeListItem(
@@ -112,21 +158,35 @@ data class MyAnimeListItem(
     val rating: Int
 )
 
-data class Anime(
-    val id: Int,
+@Entity(tableName = "anime_list")
+data class AnimeListEntity(
+    @PrimaryKey val id: Int,
     val title: String,
-    val posterUrl: String?,
-    val membersCount: Int?,
-    val rank: Int?,
-    val popularityRank: Int?,
-    val mediaType: String?,
-    val year: Int?,
-    val status: String?,
-    val episodes: Int?,
-    val episodeDurationMinutes: Int?,
-    val genres: List<Genre>,
-    val synopsis: String?,
-    val statusStats: Map<String, Int>
+    val status: String,
+    val imageUrl: String,
+    val startSeason: String,
+    val startYear: String,
+    val numEpisodesWatched: Int,
+    val totalEpisodes: Int?,
+    val rating: Int
 )
 
-data class Genre(val id: Int, val name: String)
+@Dao
+interface AnimeDao {
+    @Query(
+        value = "SELECT * FROM anime_list " +
+                "ORDER BY CASE status " +
+                "WHEN 'watching' THEN 1 " +
+                "WHEN 'completed' THEN 2 " +
+                "WHEN 'on_hold' THEN 3 " +
+                "WHEN 'dropped' THEN 4 " +
+                "ELSE 5 END"
+    )
+    fun getAll(): Flow<List<AnimeListEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(list: List<AnimeListEntity>)
+
+    @Query("DELETE FROM anime_list")
+    suspend fun clearAll()
+}
