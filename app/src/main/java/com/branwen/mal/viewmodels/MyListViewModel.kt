@@ -37,6 +37,9 @@ class MyListViewModel @Inject constructor(
     private val _loading = MutableStateFlow(true)
     val loading: StateFlow<Boolean> = _loading
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
+
     private val _selectedStatus = MutableStateFlow("all")
     val selectedStatus: StateFlow<String> = _selectedStatus
 
@@ -82,6 +85,19 @@ class MyListViewModel @Inject constructor(
                 Timber.e(it, "Error fetching anime list")
             }.also {
                 _loading.value = false
+            }
+        }
+    }
+
+    fun onPullToRefresh() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isRefreshing.value = true
+            runCatching {
+                _animeList.value = repository.getAnimeList()
+            }.onFailure {
+                Timber.e(it, "Error refreshing anime list")
+            }.also {
+                _isRefreshing.value = false
             }
         }
     }

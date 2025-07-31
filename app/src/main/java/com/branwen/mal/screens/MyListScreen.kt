@@ -18,6 +18,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,6 +43,9 @@ fun MyListScreen(
     val filteredAnimeList by viewModel.filteredAnimeList.collectAsState()
 
     val loading by viewModel.loading.collectAsState()
+
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val pullState = rememberPullToRefreshState()
 
     val listState = rememberLazyListState()
 
@@ -91,20 +96,27 @@ fun MyListScreen(
         )
 
         Box(modifier = Modifier.fillMaxSize()) {
-            if (loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                LazyColumn(
-                    state = listState,
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier
-                        .padding(12.dp, 0.dp, 12.dp, 12.dp)
-                        .fillMaxSize()
-                ) {
-                    items(filteredAnimeList) { item ->
-                        ListItem(animeItem = item, onItemClicked = { navigate(item.id) })
+            PullToRefreshBox(
+                state = pullState,
+                isRefreshing = isRefreshing,
+                onRefresh = { viewModel.onPullToRefresh() },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                if (loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                } else {
+                    LazyColumn(
+                        state = listState,
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier
+                            .padding(12.dp, 0.dp, 12.dp, 12.dp)
+                            .fillMaxSize()
+                    ) {
+                        items(filteredAnimeList) { item ->
+                            ListItem(animeItem = item, onItemClicked = { navigate(item.id) })
+                        }
                     }
                 }
             }
