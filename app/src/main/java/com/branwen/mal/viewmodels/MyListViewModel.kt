@@ -59,47 +59,25 @@ class MyListViewModel @Inject constructor(
     val listSwitchChecked = _listSwitchChecked
 
     init {
-        fetchAnimeList()
+        fetchAnimeList(isInitial = true)
     }
 
-    fun refreshAnimeList() {
-        fetchAnimeList(forceRefresh = true)
-    }
-//
-//    private fun fetchAnimeList(forceRefresh: Boolean = false) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            runCatching {
-//                _animeList.value = repository.getAnimeList()
-//            }.onFailure {
-//                Log.e("MyListViewModel", "Error fetching anime list", it)
-//            }
-//        }
-//    }
-
-    private fun fetchAnimeList(forceRefresh: Boolean = false) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _loading.value = true
-            runCatching {
+    private fun fetchAnimeList(isInitial: Boolean = false) {
+        launchCatching(
+            block = {
+                if (isInitial) _loading.value = true
                 _animeList.value = repository.getAnimeList()
-            }.onFailure {
-                Timber.e(it, "Error fetching anime list")
-            }.also {
-                _loading.value = false
+            },
+            post = {
+                if (isInitial) _loading.value = false
+                else _isRefreshing.value = false
             }
-        }
+        )
     }
 
     fun onPullToRefresh() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _isRefreshing.value = true
-            runCatching {
-                _animeList.value = repository.getAnimeList()
-            }.onFailure {
-                Timber.e(it, "Error refreshing anime list")
-            }.also {
-                _isRefreshing.value = false
-            }
-        }
+        _isRefreshing.value = true
+        fetchAnimeList(isInitial = false)
     }
 
     fun onStatusSelected(status: String) {
@@ -107,10 +85,23 @@ class MyListViewModel @Inject constructor(
     }
 }
 
-fun ViewModel.launchCatching(block: suspend () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-    runCatching {
-        block()
-    }.onFailure {
-        Timber.e(it, "Error in launchCatching")
+fun ViewModel.launchCatching(
+    block: suspend () -> Unit,
+    post: (suspend () -> Unit)? = null
+) {
+    viewModelScope.launch(Dispatchers.IO) {
+        runCatching {
+            block()
+        }.onFailure {
+            Timber.e(it, "Error in launchCatching")
+        }.also {
+            post?.let { execute ->
+                runCatching {
+                    execute()
+                }.onFailure {
+                    Timber.e(it, "Error in post-block")
+                }
+            }
+        }
     }
 }
