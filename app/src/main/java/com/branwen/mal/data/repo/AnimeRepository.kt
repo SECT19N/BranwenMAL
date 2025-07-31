@@ -4,8 +4,6 @@ import android.content.SharedPreferences
 import com.branwen.mal.models.AnimeListItem
 import com.branwen.mal.models.AnimeNode
 import com.branwen.mal.models.Picture
-import com.branwen.mal.models.toIntMap
-import com.branwen.mal.screens.MyListScreen
 import com.branwen.mal.utils.MalServiceBuilder
 
 class AnimeRepository(
@@ -41,8 +39,27 @@ class AnimeRemoteDataSource(
     suspend fun getAnimeList(): List<MyAnimeListItem> {
         val token = sharedPreferences.getString("access_token", null) ?: return emptyList()
         val service = MalServiceBuilder.provideMalApiService(token)
-        val response = service.getUserAnimeList(limit = 1000, offset = 0)
-        return response.data.sortedBy { statusOrder[it.listStatus?.status] ?: Int.MAX_VALUE }.toDomain()
+
+        val fullList = mutableListOf<AnimeListItem>()
+        var offset = 0
+        val limit = 100
+
+        while (true) {
+            val response = service.getUserAnimeList(limit = limit, offset = offset)
+            val items = response.data
+            if (items.isEmpty()) break
+
+            fullList += items
+
+            // If fewer than 100 items were returned, this is the last page.
+            if (items.size < limit) break
+
+            offset += limit
+        }
+
+        return fullList
+            .sortedBy { statusOrder[it.listStatus?.status] ?: Int.MAX_VALUE }
+            .toDomain()
     }
 
     suspend fun getAnimeDetails(animeId: Int): AnimeNode {
@@ -71,25 +88,6 @@ class AnimeRemoteDataSource(
             numEpisodesWatched = listStatus?.numEpisodesWatched ?: 0,
             totalEpisodes = node.numEpisodes,
             rating = listStatus?.score ?: 0
-        )
-    }
-
-    private fun AnimeNode.toDomain(): Anime {
-        return Anime(
-            id = id,
-            title = title,
-            posterUrl = mainPicture.large,
-            membersCount = numListUsers,
-            rank = rank,
-            popularityRank = popularity,
-            mediaType = mediaType,
-            year = startSeason.year,
-            status = status,
-            episodes = numEpisodes,
-            episodeDurationMinutes = averageEpisodeDuration?.div(60),
-            genres = genres?.map { Genre(it.id, it.name) } ?: emptyList(),
-            synopsis = synopsis,
-            statusStats = statistics?.status?.toIntMap() ?: emptyMap()
         )
     }
 }
@@ -132,14 +130,3 @@ data class Anime(
 )
 
 data class Genre(val id: Int, val name: String)
-
-data class AnimeDetailsUiModel(
-    val title: String,
-    val posterUrl: String?,
-    val summaryLine: String,
-    val genres: List<GenreUi>,
-    val synopsis: String,
-    val chartData: Map<String, Int>
-)
-
-data class GenreUi(val id: Int, val name: String)

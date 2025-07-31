@@ -34,6 +34,9 @@ class MyListViewModel @Inject constructor(
     private val _animeList = MutableStateFlow<List<MyAnimeListItem>>(emptyList())
     val animeList: StateFlow<List<MyAnimeListItem>> = _animeList
 
+    private val _loading = MutableStateFlow(true)
+    val loading: StateFlow<Boolean> = _loading
+
     private val _selectedStatus = MutableStateFlow("all")
     val selectedStatus: StateFlow<String> = _selectedStatus
 
@@ -70,8 +73,17 @@ class MyListViewModel @Inject constructor(
 //        }
 //    }
 
-    private fun fetchAnimeList(forceRefresh: Boolean = false) = launchCatching {
-        _animeList.value = repository.getAnimeList()
+    private fun fetchAnimeList(forceRefresh: Boolean = false) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _loading.value = true
+            runCatching {
+                _animeList.value = repository.getAnimeList()
+            }.onFailure {
+                Timber.e(it, "Error fetching anime list")
+            }.also {
+                _loading.value = false
+            }
+        }
     }
 
     fun onStatusSelected(status: String) {

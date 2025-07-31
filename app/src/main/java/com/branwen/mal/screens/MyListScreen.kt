@@ -1,6 +1,7 @@
 package com.branwen.mal.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,6 +11,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,6 +39,8 @@ fun MyListScreen(
 ) {
     val selectedStatus by viewModel.selectedStatus.collectAsState()
     val filteredAnimeList by viewModel.filteredAnimeList.collectAsState()
+
+    val loading by viewModel.loading.collectAsState()
 
     val listState = rememberLazyListState()
 
@@ -85,15 +90,23 @@ fun MyListScreen(
             }
         )
 
-        LazyColumn(
-            state = listState,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier
-                .padding(12.dp, 0.dp, 12.dp, 12.dp)
-                .fillMaxSize()
-        ) {
-            items(filteredAnimeList) { item ->
-                ListItem(animeItem = item, onItemClicked = { navigate(item.id) })
+        Box(modifier = Modifier.fillMaxSize()) {
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else {
+                LazyColumn(
+                    state = listState,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier
+                        .padding(12.dp, 0.dp, 12.dp, 12.dp)
+                        .fillMaxSize()
+                ) {
+                    items(filteredAnimeList) { item ->
+                        ListItem(animeItem = item, onItemClicked = { navigate(item.id) })
+                    }
+                }
             }
         }
     }
