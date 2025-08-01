@@ -54,6 +54,7 @@ android {
 dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
+    ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.android.compiler)
 
     implementation(libs.timber)
@@ -79,7 +80,6 @@ dependencies {
     implementation(libs.converter.moshi)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
-    implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
     implementation(libs.javax.inject)
     testImplementation(libs.junit)

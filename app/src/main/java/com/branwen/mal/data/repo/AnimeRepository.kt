@@ -2,11 +2,13 @@ package com.branwen.mal.data.repo
 
 import android.content.SharedPreferences
 import androidx.room.Dao
+import androidx.room.Database
 import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.RoomDatabase
 import com.branwen.mal.models.AnimeListItem
 import com.branwen.mal.models.AnimeNode
 import com.branwen.mal.models.Picture
@@ -31,6 +33,11 @@ class AnimeRepository(
         }
     }
 
+    suspend fun fetchAndCacheAnimeList() {
+        val list = remote.getAnimeList()
+        local.saveAnimeList(list)
+    }
+
     suspend fun getAnimeDetails(animeId: Int): AnimeNode {
         return runCatching {
             remote.getAnimeDetails(animeId)
@@ -48,6 +55,9 @@ class AnimeRemoteDataSource(
     private val statusOrder = listOf("watching", "completed", "on_hold", "dropped", "plan_to_watch").withIndex()
         .associate { it.value to it.index }
 
+    /**
+     * Get the anime list from the MAL API as a [List] of [MyAnimeListItem]
+     */
     suspend fun getAnimeList(): List<MyAnimeListItem> {
         val token = sharedPreferences.getString("access_token", null) ?: return emptyList()
         val service = MalServiceBuilder.provideMalApiService(token)
@@ -85,10 +95,16 @@ class AnimeRemoteDataSource(
         return MalServiceBuilder.provideMalApiService(token).getAnimeDetails(animeId)
     }
 
+    /**
+     * Convert a [List] of [AnimeListItem] to a list of [MyAnimeListItem]
+     */
     private fun List<AnimeListItem>.toDomain(): List<MyAnimeListItem> {
         return map { it.toDomain() }
     }
 
+    /**
+     * Convert a [AnimeListItem] to a [MyAnimeListItem]
+     */
     private fun AnimeListItem.toDomain(): MyAnimeListItem {
         return MyAnimeListItem(
             id = node.id,
@@ -105,12 +121,18 @@ class AnimeRemoteDataSource(
 }
 
 class AnimeLocalDataSource(private val dao: AnimeDao) {
+    /**
+     * Get the anime list from the local database as a [Flow] of [MyAnimeListItem]
+     */
     fun getAnimeListFlow(): Flow<List<MyAnimeListItem>> =
         dao.getAll()
             .map { entities ->
                 entities.map { it.toDomain() }
             }
 
+    /**
+     * Save the anime list to the local database
+     */
     suspend fun saveAnimeList(list: List<MyAnimeListItem>) {
         dao.clearAll()
         dao.insertAll(
@@ -121,6 +143,9 @@ class AnimeLocalDataSource(private val dao: AnimeDao) {
     suspend fun getAnimeDetails(animeId: Int): AnimeNode? = null
     suspend fun saveAnimeDetails(node: AnimeNode) = Unit
 
+    /**
+     * Convert a [AnimeListEntity] to a [MyAnimeListItem]
+     */
     private fun AnimeListEntity.toDomain() = MyAnimeListItem(
         id = id,
         title = title,
@@ -133,6 +158,9 @@ class AnimeLocalDataSource(private val dao: AnimeDao) {
         rating = rating
     )
 
+    /**
+     * Convert a [MyAnimeListItem] to a [AnimeListEntity]
+     */
     private fun MyAnimeListItem.toEntity() = AnimeListEntity(
         id = id,
         title = title,
@@ -189,4 +217,9 @@ interface AnimeDao {
 
     @Query("DELETE FROM anime_list")
     suspend fun clearAll()
+}
+
+@Database(entities = [AnimeListEntity::class], version = 1)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun animeDao(): AnimeDao
 }

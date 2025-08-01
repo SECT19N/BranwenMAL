@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -60,16 +59,25 @@ class MyListViewModel @Inject constructor(
     val listSwitchChecked = _listSwitchChecked
 
     init {
+        observeLocal()
         fetchAnimeList(isInitial = true)
+    }
+
+    private fun observeLocal() {
+        launchCatching(
+            block = {
+                repository.getAnimeListFlow().collect { list ->
+                    _animeList.value = list
+                }
+            }
+        )
     }
 
     private fun fetchAnimeList(isInitial: Boolean = false) {
         launchCatching(
             block = {
                 if (isInitial) _loading.value = true
-                repository.getAnimeListFlow().take(1).collect { list ->
-                    _animeList.value = list
-                }
+                repository.fetchAndCacheAnimeList() // separate suspend function
             },
             post = {
                 if (isInitial) _loading.value = false

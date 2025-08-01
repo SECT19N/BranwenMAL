@@ -30,6 +30,7 @@ roomKtx = "2.7.2"
 roomRuntime = "2.7.2"
 javaxInject = "1"
 timber = "5.0.1"
+roomCompiler = "2.7.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -70,6 +71,7 @@ androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = 
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomRuntime" }
 javax-inject = { group = "javax.inject", name = "javax.inject", version.ref = "javaxInject" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -2,9 +2,12 @@ package com.branwen.mal.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.room.Room
+import com.branwen.mal.data.repo.AnimeDao
 import com.branwen.mal.data.repo.AnimeLocalDataSource
 import com.branwen.mal.data.repo.AnimeRemoteDataSource
 import com.branwen.mal.data.repo.AnimeRepository
+import com.branwen.mal.data.repo.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,11 +24,20 @@ object AppModule {
         context.getSharedPreferences("bran_mal_prefs", Context.MODE_PRIVATE)
 
     @Provides
+    @Singleton
+    fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
+        Room.databaseBuilder(context, AppDatabase::class.java, "anime_db")
+            .fallbackToDestructiveMigration(false).build()
+
+    @Provides
+    fun provideAnimeDao(db: AppDatabase): AnimeDao = db.animeDao()
+
+    @Provides
     fun provideRemote(sharedPrefs: SharedPreferences): AnimeRemoteDataSource =
         AnimeRemoteDataSource(sharedPrefs)
 
     @Provides
-    fun provideLocal(): AnimeLocalDataSource = AnimeLocalDataSource()
+    fun provideLocal(animeDao: AnimeDao): AnimeLocalDataSource = AnimeLocalDataSource(animeDao)
 
     @Provides
     @Singleton
