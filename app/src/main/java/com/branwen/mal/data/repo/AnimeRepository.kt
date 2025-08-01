@@ -219,7 +219,11 @@ interface AnimeDao {
     suspend fun clearAll()
 }
 
-@Database(entities = [AnimeListEntity::class], version = 1)
+@Database(
+    entities = [AnimeListEntity::class],
+    version = 1,
+    exportSchema = false
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun animeDao(): AnimeDao
 }
