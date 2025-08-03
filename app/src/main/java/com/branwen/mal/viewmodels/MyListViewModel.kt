@@ -18,22 +18,10 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-data class MyListUiState(
-    val animeList: List<AnimeListItem> = emptyList(),
-    val selectedStatus: String = "all",
-    val filteredAnimeList: List<AnimeListItem> = emptyList()
-)
-
 @HiltViewModel
 class MyListViewModel @Inject constructor(
     private val repository: AnimeRepository,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(MyListUiState())
-    val uiState: StateFlow<MyListUiState> = _uiState.asStateFlow()
-
-    private val _animeList = MutableStateFlow<List<MyAnimeListItem>>(emptyList())
-    val animeList: StateFlow<List<MyAnimeListItem>> = _animeList
-
     private val _loading = MutableStateFlow(true)
     val loading: StateFlow<Boolean> = _loading
 
@@ -43,6 +31,7 @@ class MyListViewModel @Inject constructor(
     private val _selectedStatus = MutableStateFlow("all")
     val selectedStatus: StateFlow<String> = _selectedStatus
 
+    private val _animeList = MutableStateFlow<List<MyAnimeListItem>>(emptyList())
     val filteredAnimeList: StateFlow<List<MyAnimeListItem>> = combine(
         _animeList, _selectedStatus
     ) { fullList, status ->
@@ -77,7 +66,7 @@ class MyListViewModel @Inject constructor(
         launchCatching(
             block = {
                 if (isInitial) _loading.value = true
-                repository.fetchAndCacheAnimeList() // separate suspend function
+                repository.fetchAndCacheAnimeList()
             },
             post = {
                 if (isInitial) _loading.value = false
