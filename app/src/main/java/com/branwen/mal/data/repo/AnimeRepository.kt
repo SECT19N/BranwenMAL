@@ -203,12 +203,14 @@ data class AnimeListEntity(
 interface AnimeDao {
     @Query(
         value = "SELECT * FROM anime_list " +
-                "ORDER BY CASE status " +
-                "WHEN 'watching' THEN 1 " +
-                "WHEN 'completed' THEN 2 " +
-                "WHEN 'on_hold' THEN 3 " +
-                "WHEN 'dropped' THEN 4 " +
-                "ELSE 5 END"
+                "ORDER BY LOWER(TITLE) ASC, " +
+                "CASE status " +
+                "   WHEN 'watching' THEN 1 " +
+                "   WHEN 'completed' THEN 2 " +
+                "   WHEN 'on_hold' THEN 3 " +
+                "   WHEN 'dropped' THEN 4 " +
+                "   ELSE 5 " +
+                "END"
     )
     fun getAll(): Flow<List<AnimeListEntity>>
 
