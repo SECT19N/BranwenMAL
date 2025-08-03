@@ -5,19 +5,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.branwen.mal.data.repo.AnimeRepository
 import com.branwen.mal.data.repo.MyAnimeListItem
-import com.branwen.mal.models.AnimeListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * ViewModel for the My List screen.
+ *
+ * This ViewModel is responsible for fetching and managing the user's anime list,
+ * handling loading and refreshing states, and filtering the list based on status.
+ *
+ * @property repository The [AnimeRepository] used to fetch anime data.
+ */
 @HiltViewModel
 class MyListViewModel @Inject constructor(
     private val repository: AnimeRepository,

@@ -1,38 +1,43 @@
 package com.branwen.mal.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.branwen.mal.components.ListItem
+import com.branwen.mal.components.AnimeListScreenContent
 import com.branwen.mal.components.StatusFilterChips
 import com.branwen.mal.viewmodels.MyListViewModel
 
+/**
+ * Composable function that displays the user's anime list.
+ *
+ * This screen allows the user to view their anime list, filter it by status,
+ * and navigate to the details of a specific anime. It also supports pull-to-refresh
+ * functionality.
+ *
+ * @param viewModel The [MyListViewModel] that provides the data and logic for this screen.
+ *                  It is injected using Hilt.
+ * @param navigate A lambda function that takes an anime ID (Int) and navigates to the
+ *                 corresponding anime details screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyListScreen(
@@ -95,31 +100,14 @@ fun MyListScreen(
             }
         )
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            PullToRefreshBox(
-                state = pullState,
-                isRefreshing = isRefreshing,
-                onRefresh = { viewModel.onPullToRefresh() },
-                modifier = Modifier.fillMaxSize()
-            ) {
-                if (loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                } else {
-                    LazyColumn(
-                        state = listState,
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier
-                            .padding(12.dp, 0.dp, 12.dp, 12.dp)
-                            .fillMaxSize()
-                    ) {
-                        items(filteredAnimeList) { item ->
-                            ListItem(animeItem = item, onItemClicked = { navigate(item.id) })
-                        }
-                    }
-                }
-            }
-        }
+        AnimeListScreenContent(
+            isRefreshing = isRefreshing,
+            loading = loading,
+            filteredAnimeList = filteredAnimeList,
+            pullState = pullState,
+            listState = listState,
+            onRefresh = { viewModel.onPullToRefresh() },
+            onItemClicked = { id -> navigate(id) }
+        )
     }
 }
