@@ -2,66 +2,48 @@ package com.branwen.mal.viewmodels
 
 import android.app.Application
 import android.content.Context.MODE_PRIVATE
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.branwen.mal.models.AnimeListItem
+import com.branwen.mal.models.uistate.DiscoverUiState
 import com.branwen.mal.utils.MalServiceBuilder.provideMalApiService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-
-
-data class DiscoverUIState(
-    val topTenAnime: List<AnimeListItem> = emptyList(),
-    val topTenAiringAnime: List<AnimeListItem> = emptyList(),
-    val topTenUpcomingAnime: List<AnimeListItem> = emptyList(),
-    val topTenMovies: List<AnimeListItem> = emptyList(),
-    val tenSuggestedAnime: List<AnimeListItem> = emptyList()
-)
+import timber.log.Timber
 
 class DiscoverViewModel(application: Application) : AndroidViewModel(application) {
-    private val _topTenAnime = MutableStateFlow<List<AnimeListItem>>(emptyList())
-    private val _topTenAiringAnime = MutableStateFlow<List<AnimeListItem>>(emptyList())
-    private val _topTenUpcomingAnime = MutableStateFlow<List<AnimeListItem>>(emptyList())
-    private val _topTenMovies = MutableStateFlow<List<AnimeListItem>>(emptyList())
-    private val _tenSuggestedAnime = MutableStateFlow<List<AnimeListItem>>(emptyList())
-
-    val topTenAnime: StateFlow<List<AnimeListItem>> = _topTenAnime
-    val topTenAiringAnime: StateFlow<List<AnimeListItem>> = _topTenAiringAnime
-    val topTenUpcomingAnime: StateFlow<List<AnimeListItem>> = _topTenUpcomingAnime
-    val topTenMovies: StateFlow<List<AnimeListItem>> = _topTenMovies
-    val tenSuggestedAnime: StateFlow<List<AnimeListItem>> = _tenSuggestedAnime
-
-
-    private val _discoverUIState = MutableStateFlow(DiscoverUIState())
-
-    val discoverUIState: StateFlow<DiscoverUIState> = _discoverUIState
+    private val _discoverUIState = MutableStateFlow(DiscoverUiState())
+    val discoverUIState: StateFlow<DiscoverUiState> = _discoverUIState
 
     init {
-        fetchAnimeRanking("all", _topTenAnime)
-        fetchAnimeRanking("airing", _topTenAiringAnime)
-        fetchAnimeRanking("upcoming", _topTenUpcomingAnime)
-        fetchAnimeRanking("movie", _topTenMovies)
+        fetchAnimeRanking("all")
+        fetchAnimeRanking("airing")
+        fetchAnimeRanking("upcoming")
+        fetchAnimeRanking("movie")
         fetchTenSuggestedAnime()
     }
 
-    private fun fetchAnimeRanking(
-        rankingType: String,
-        animeList: MutableStateFlow<List<AnimeListItem>>
-    ) {
+    private fun fetchAnimeRanking(rankingType: String) {
         viewModelScope.launch {
             val context = getApplication<Application>().applicationContext
             val prefs = context.getSharedPreferences("bran_mal_prefs", MODE_PRIVATE)
             val accessToken = prefs.getString("access_token", null)
 
             if (accessToken != null) {
-                try {
+                runCatching {
                     val apiService = provideMalApiService(accessToken)
                     val response = apiService.getAnimeRanking(rankingType = rankingType)
-                    animeList.value = response.data.sortedBy { it.ranking?.rank }
-                } catch (e: Exception) {
-                    Log.e("TopTen${rankingType.replaceFirstChar { it.uppercase() }} Exception", "${e.message}")
+                    val sortedList = response.data.sortedBy { it.ranking?.rank }
+
+                    _discoverUIState.value = when (rankingType) {
+                        "all" -> _discoverUIState.value.copy(topTenAnime = sortedList)
+                        "airing" -> _discoverUIState.value.copy(topTenAiringAnime = sortedList)
+                        "upcoming" -> _discoverUIState.value.copy(topTenUpcomingAnime = sortedList)
+                        "movie" -> _discoverUIState.value.copy(topTenMovies = sortedList)
+                        else -> _discoverUIState.value
+                    }
+                }.onFailure {
+                    Timber.e(it, "Failed to fetch top anime for type: $rankingType")
                 }
             }
         }
@@ -74,12 +56,12 @@ class DiscoverViewModel(application: Application) : AndroidViewModel(application
             val accessToken = prefs.getString("access_token", null)
 
             if (accessToken != null) {
-                try {
+                runCatching {
                     val apiService = provideMalApiService(accessToken)
                     val response = apiService.getAnimeSuggestions()
-                    _tenSuggestedAnime.value = response.data.sortedBy { it.ranking?.rank }
-                } catch (e: Exception) {
-                    Log.e("TopTenMovies Exception", "${e.message}")
+                    _discoverUIState.value.tenSuggestedAnime = response.data.sortedBy { it.ranking?.rank }
+                }.onFailure {
+                    Timber.e(it, "TopTen Suggested")
                 }
             }
         }
