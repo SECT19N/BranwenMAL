@@ -10,13 +10,12 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_branwen"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_branwen"
         android:supportsRtl="true"
         android:theme="@style/Theme.BranwenMAL">
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/Theme.BranwenMAL">
             <intent-filter>
