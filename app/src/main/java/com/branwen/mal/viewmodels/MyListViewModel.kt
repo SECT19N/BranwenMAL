@@ -5,15 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.branwen.mal.data.repo.AnimeRepository
 import com.branwen.mal.models.domain.MyAnimeListItem
+import com.branwen.mal.utils.launchCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -96,26 +94,5 @@ class MyListViewModel @Inject constructor(
                 repository.incrementAnimeListStatus(animeItem)
             }
         )
-    }
-}
-
-fun ViewModel.launchCatching(
-    block: suspend () -> Unit,
-    post: (suspend () -> Unit)? = null
-) {
-    viewModelScope.launch(Dispatchers.IO) {
-        runCatching {
-            block()
-        }.onFailure {
-            Timber.e(it, "Error in launchCatching")
-        }.also {
-            post?.let { execute ->
-                runCatching {
-                    execute()
-                }.onFailure {
-                    Timber.e(it, "Error in post-block")
-                }
-            }
-        }
     }
 }
