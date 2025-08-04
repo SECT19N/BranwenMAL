@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.branwen.mal.data.repo.MyAnimeListItem
+import com.branwen.mal.models.domain.MyAnimeListItem
 
 /**
  * Composable function that displays the content of the anime list screen.
@@ -54,7 +54,7 @@ fun AnimeListScreenContent(
             } else {
                 LazyColumn(
                     state = listState,
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier
                         .padding(12.dp, 0.dp, 12.dp, 12.dp)
                         .fillMaxSize()

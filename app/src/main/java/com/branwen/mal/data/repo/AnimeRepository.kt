@@ -11,6 +11,7 @@ import androidx.room.RoomDatabase
 import com.branwen.mal.data.local.AnimeLocalDataSource
 import com.branwen.mal.data.remote.AnimeRemoteDataSource
 import com.branwen.mal.models.AnimeNode
+import com.branwen.mal.models.domain.MyAnimeListItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.firstOrNull
@@ -45,18 +46,6 @@ class AnimeRepository(
         }
     }
 }
-
-data class MyAnimeListItem(
-    val id: Int,
-    val title: String,
-    val status: String,
-    val imageUrl: String,
-    val startSeason: String,
-    val startYear: String,
-    val numEpisodesWatched: Int,
-    val totalEpisodes: Int?,
-    val rating: Int
-)
 
 @Entity(tableName = "anime_list")
 data class AnimeListEntity(

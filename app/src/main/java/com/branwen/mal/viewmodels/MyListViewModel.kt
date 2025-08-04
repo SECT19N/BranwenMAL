@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.branwen.mal.data.repo.AnimeRepository
-import com.branwen.mal.data.repo.MyAnimeListItem
+import com.branwen.mal.models.domain.MyAnimeListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

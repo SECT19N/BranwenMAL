@@ -33,7 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.branwen.mal.data.repo.MyAnimeListItem
+import com.branwen.mal.models.domain.MyAnimeListItem
 
 @Composable
 fun ListItem(
