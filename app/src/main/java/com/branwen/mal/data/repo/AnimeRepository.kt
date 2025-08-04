@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import timber.log.Timber
 
 /**
  * Repository for handling anime data, acting as a single source of truth.
@@ -38,9 +39,23 @@ class AnimeRepository(
         local.saveAnimeList(list)
     }
 
+    /**
+     * Increments the watched status of an anime item both remotely and locally.
+     *
+     * This function first attempts to update the anime's status on the remote server.
+     * If the remote update is successful, it then updates the watched episodes count
+     * in the local database. If the remote update fails, an error is logged.
+     *
+     * @param animeItem The [MyAnimeListItem] whose status needs to be incremented.
+     */
     suspend fun incrementAnimeListStatus(animeItem: MyAnimeListItem) {
-        remote.incrementAnimeListStatus(animeItem)
-        local.updateWatchedEpisodes(animeItem)
+        runCatching {
+            remote.incrementAnimeListStatus(animeItem)
+        }.onSuccess {
+            local.updateWatchedEpisodes(animeItem)
+        }.onFailure {
+            Timber.e(it, "Failed to update remote")
+        }
     }
 
     suspend fun getAnimeDetails(animeId: Int): AnimeNode {
