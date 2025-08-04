@@ -5,9 +5,9 @@ import android.content.SharedPreferences
 import androidx.room.Room
 import com.branwen.mal.data.local.AnimeLocalDataSource
 import com.branwen.mal.data.remote.AnimeRemoteDataSource
-import com.branwen.mal.data.repo.AnimeDao
 import com.branwen.mal.data.repo.AnimeRepository
-import com.branwen.mal.data.repo.AppDatabase
+import com.branwen.mal.interfaces.AnimeDao
+import com.branwen.mal.models.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

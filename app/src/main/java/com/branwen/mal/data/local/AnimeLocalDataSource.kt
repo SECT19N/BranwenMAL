@@ -1,9 +1,9 @@
 package com.branwen.mal.data.local
 
-import com.branwen.mal.data.repo.AnimeDao
-import com.branwen.mal.data.repo.AnimeListEntity
+import com.branwen.mal.interfaces.AnimeDao
 import com.branwen.mal.models.AnimeNode
 import com.branwen.mal.models.domain.MyAnimeListItem
+import com.branwen.mal.models.entity.AnimeListEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

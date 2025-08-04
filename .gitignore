@@ -8,6 +8,7 @@ local.properties
 # IDE files
 .idea/
 *.iml
+.kotlin/
 
 # Log files
 *.log
