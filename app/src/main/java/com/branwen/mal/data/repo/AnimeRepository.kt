@@ -38,6 +38,11 @@ class AnimeRepository(
         local.saveAnimeList(list)
     }
 
+    suspend fun incrementAnimeListStatus(animeItem: MyAnimeListItem) {
+        remote.incrementAnimeListStatus(animeItem)
+        local.updateWatchedEpisodes(animeItem)
+    }
+
     suspend fun getAnimeDetails(animeId: Int): AnimeNode {
         return runCatching {
             remote.getAnimeDetails(animeId)

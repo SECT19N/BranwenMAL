@@ -3,6 +3,8 @@ package com.branwen.mal.interfaces
 import com.branwen.mal.models.AnimeListResponse
 import com.branwen.mal.models.AnimeNode
 import com.branwen.mal.models.ListStatus
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.Path
@@ -29,11 +31,12 @@ interface MalApi {
     ): AnimeListResponse
 
     @PATCH("v2/anime/{anime_id}/my_list_status")
+    @FormUrlEncoded
     suspend fun patchAnimeListStatus(
         @Path("anime_id") animeId: Int,
-        @Query("status") status: String,
-        @Query("score") score: Int,
-        @Query("num_watched_episodes") numWatchedEpisodes: Int,
+        @Field("status") status: String,
+        @Field("score") score: Int,
+        @Field("num_watched_episodes") numWatchedEpisodes: Int,
     ): ListStatus
 
     @GET("v2/anime/ranking")

@@ -38,7 +38,8 @@ import com.branwen.mal.models.domain.MyAnimeListItem
 @Composable
 fun ListItem(
     animeItem: MyAnimeListItem,
-    onItemClicked: (Int) -> Unit
+    onItemClicked: (Int) -> Unit,
+    onProgressIncremented: (MyAnimeListItem) -> Unit,
 ) {
     val borderColor = statusToColor(animeItem.status)
 
@@ -124,12 +125,18 @@ fun ListItem(
                             )
                         }
 
-                        IconButton(onClick = { /*TODO*/ }) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
+                        animeItem.totalEpisodes?.let {
+                            if (animeItem.numEpisodesWatched < it) {
+                                IconButton(onClick = {
+                                    onProgressIncremented(animeItem)
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                    )
+                                }
+                            }
                         }
                     }
 

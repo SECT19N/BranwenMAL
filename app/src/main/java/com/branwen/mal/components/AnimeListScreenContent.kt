@@ -38,7 +38,8 @@ fun AnimeListScreenContent(
     pullState: PullToRefreshState,
     listState: LazyListState,
     onRefresh: () -> Unit,
-    onItemClicked: (Int) -> Unit
+    onItemClicked: (Int) -> Unit,
+    onProgressIncremented: (MyAnimeListItem) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         PullToRefreshBox(
@@ -60,7 +61,10 @@ fun AnimeListScreenContent(
                         .fillMaxSize()
                 ) {
                     items(filteredAnimeList) { item ->
-                        ListItem(animeItem = item, onItemClicked = { onItemClicked(item.id) })
+                        ListItem(
+                            animeItem = item,
+                            onItemClicked = { onItemClicked(item.id) },
+                            onProgressIncremented = { onProgressIncremented(item) })
                     }
                 }
             }

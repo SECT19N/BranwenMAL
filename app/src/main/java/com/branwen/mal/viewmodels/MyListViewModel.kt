@@ -89,6 +89,14 @@ class MyListViewModel @Inject constructor(
     fun onStatusSelected(status: String) {
         _selectedStatus.value = status
     }
+
+    fun onProgressIncrement(animeItem: MyAnimeListItem) {
+        launchCatching(
+            block = {
+                repository.incrementAnimeListStatus(animeItem)
+            }
+        )
+    }
 }
 
 fun ViewModel.launchCatching(

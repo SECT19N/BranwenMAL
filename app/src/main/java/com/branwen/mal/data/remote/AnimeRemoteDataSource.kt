@@ -62,6 +62,22 @@ class AnimeRemoteDataSource(
         return MalServiceBuilder.provideMalApiService(token).getAnimeDetails(animeId)
     }
 
+    suspend fun incrementAnimeListStatus(animeItem: MyAnimeListItem) {
+        val token = sharedPreferences.getString("access_token", null) ?: return
+        val service = MalServiceBuilder.provideMalApiService(token)
+
+        val newEpisodesWatched = animeItem.numEpisodesWatched + 1
+        val status = animeItem.status.ifEmpty { "watching" } // sensible default
+        val score = animeItem.rating
+
+        service.patchAnimeListStatus(
+            animeItem.id,
+            status,
+            score,
+            newEpisodesWatched
+        )
+    }
+
     /**
      * Convert a [List] of [AnimeListItem] to a list of [MyAnimeListItem]
      */

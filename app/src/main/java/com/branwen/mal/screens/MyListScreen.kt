@@ -107,7 +107,10 @@ fun MyListScreen(
             pullState = pullState,
             listState = listState,
             onRefresh = { viewModel.onPullToRefresh() },
-            onItemClicked = { id -> navigate(id) }
+            onItemClicked = { id -> navigate(id) },
+            onProgressIncremented = { anime ->
+                viewModel.onProgressIncrement(anime)
+            }
         )
     }
 }

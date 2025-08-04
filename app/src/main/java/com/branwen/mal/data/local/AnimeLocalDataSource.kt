@@ -34,6 +34,10 @@ class AnimeLocalDataSource(private val dao: AnimeDao) {
         )
     }
 
+    suspend fun updateWatchedEpisodes(animeItem: MyAnimeListItem) {
+        dao.updateWatchedEpisodes(animeItem.id, animeItem.numEpisodesWatched + 1)
+    }
+
     suspend fun getAnimeDetails(animeId: Int): AnimeNode? = null
     suspend fun saveAnimeDetails(node: AnimeNode) = Unit
 

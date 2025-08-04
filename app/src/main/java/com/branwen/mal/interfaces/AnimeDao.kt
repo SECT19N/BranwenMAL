@@ -33,4 +33,7 @@ interface AnimeDao {
 
     @Query("DELETE FROM anime_list")
     suspend fun clearAll()
+
+    @Query("UPDATE anime_list SET numEpisodesWatched = :newWatched WHERE id = :animeId")
+    suspend fun updateWatchedEpisodes(animeId: Int, newWatched: Int)
 }
