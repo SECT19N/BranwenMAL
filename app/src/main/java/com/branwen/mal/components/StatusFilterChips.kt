@@ -11,6 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+/**
+ * A composable function that displays a row of filter chips for different anime statuses.
+ *
+ * @param selectedStatus The currently selected status.
+ * @param onStatusSelected A callback function that is invoked when a status is selected.
+ */
 @Composable
 fun StatusFilterChips(
     selectedStatus: String,
