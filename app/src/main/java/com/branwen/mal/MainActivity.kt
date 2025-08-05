@@ -110,7 +110,7 @@ interface MalAuthService {
 }
 
 data class TokenResponse(
-    @Json(name = "expires_in") val expiresIn: Int,
-    @Json(name = "access_token") val accessToken: String,
-    @Json(name = "refresh_token") val refreshToken: String
+    @param:Json(name = "expires_in") val expiresIn: Int,
+    @param:Json(name = "access_token") val accessToken: String,
+    @param:Json(name = "refresh_token") val refreshToken: String
 )
