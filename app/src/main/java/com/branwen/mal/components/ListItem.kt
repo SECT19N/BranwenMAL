@@ -127,9 +127,9 @@ fun ListItem(
 
                         animeItem.totalEpisodes?.let {
                             if (animeItem.numEpisodesWatched < it) {
-                                IconButton(onClick = {
-                                    onProgressIncremented(animeItem)
-                                }) {
+                                IconButton(
+                                    onClick = { onProgressIncremented(animeItem) }
+                                ) {
                                     Icon(
                                         imageVector = Icons.Default.Add,
                                         contentDescription = null,
