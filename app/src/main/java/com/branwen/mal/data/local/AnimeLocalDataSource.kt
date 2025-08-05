@@ -1,5 +1,6 @@
 package com.branwen.mal.data.local
 
+import com.branwen.mal.data.repo.UpdatedAnimeResponse
 import com.branwen.mal.interfaces.AnimeDao
 import com.branwen.mal.models.AnimeNode
 import com.branwen.mal.models.domain.MyAnimeListItem
@@ -34,8 +35,8 @@ class AnimeLocalDataSource(private val dao: AnimeDao) {
         )
     }
 
-    suspend fun updateWatchedEpisodes(animeItem: MyAnimeListItem) {
-        dao.updateWatchedEpisodes(animeItem.id, animeItem.numEpisodesWatched + 1)
+    suspend fun updateWatchedEpisodes(id: Int, numEpisodesWatched: Int) {
+        dao.updateWatchedEpisodes(id, numEpisodesWatched)
     }
 
     suspend fun getAnimeDetails(animeId: Int): AnimeNode? = null

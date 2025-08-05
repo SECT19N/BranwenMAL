@@ -53,8 +53,8 @@ class AnimeRepository(
     suspend fun incrementAnimeListStatus(animeItem: MyAnimeListItem) {
         runCatching {
             remote.incrementAnimeListStatus(animeItem)
-        }.onSuccess {
-            local.updateWatchedEpisodes(animeItem)
+        }.onSuccess { remoteResponse ->
+            local.updateWatchedEpisodes(animeItem.id, remoteResponse.numEpisodesWatched)
         }.onFailure {
             Timber.e(it, "Failed to update remote")
         }
