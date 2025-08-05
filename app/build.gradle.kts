@@ -17,6 +17,11 @@ android {
 
     buildFeatures {
         buildConfig = true
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
 
     defaultConfig {
@@ -55,6 +60,14 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.material3)
+    implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.material)
+    implementation(libs.androidx.animation)
+    implementation(libs.androidx.animation.core)
+    implementation(libs.androidx.animation.graphics)
+    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.runtime)
+    implementation(libs.ui)
     ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.android.compiler)
 

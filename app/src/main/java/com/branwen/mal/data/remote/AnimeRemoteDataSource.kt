@@ -1,6 +1,7 @@
 package com.branwen.mal.data.remote
 
 import android.content.SharedPreferences
+import com.branwen.mal.data.repo.UpdatedAnimeResponse
 import com.branwen.mal.models.AnimeListItem
 import com.branwen.mal.models.AnimeNode
 import com.branwen.mal.models.Picture
@@ -62,15 +63,28 @@ class AnimeRemoteDataSource(
         return MalServiceBuilder.provideMalApiService(token).getAnimeDetails(animeId)
     }
 
-    suspend fun incrementAnimeListStatus(animeItem: MyAnimeListItem) {
-        val token = sharedPreferences.getString("access_token", null) ?: return
+    suspend fun incrementAnimeListStatus(animeItem: MyAnimeListItem): UpdatedAnimeResponse {
+        val token = sharedPreferences.getString("access_token", null)
+            ?: return UpdatedAnimeResponse(
+                animeItem.status,
+                animeItem.rating,
+                animeItem.numEpisodesWatched,
+                false,
+                "", // TODO localdatetime needs api 26
+                0,
+                0,
+                0,
+                emptyList<String>(),
+                ""
+            )
+
         val service = MalServiceBuilder.provideMalApiService(token)
 
         val newEpisodesWatched = animeItem.numEpisodesWatched + 1
         val status = animeItem.status.ifEmpty { "watching" } // sensible default
         val score = animeItem.rating
 
-        service.patchAnimeListStatus(
+        return service.patchAnimeListStatus(
             animeItem.id,
             status,
             score,

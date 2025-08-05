@@ -1,5 +1,6 @@
 package com.branwen.mal.interfaces
 
+import com.branwen.mal.data.repo.UpdatedAnimeResponse
 import com.branwen.mal.models.AnimeListResponse
 import com.branwen.mal.models.AnimeNode
 import com.branwen.mal.models.ListStatus
@@ -80,7 +81,7 @@ interface MalApi {
         @Field("status") status: String,
         @Field("score") score: Int,
         @Field("num_watched_episodes") numWatchedEpisodes: Int,
-    ): ListStatus
+    ): UpdatedAnimeResponse
 
     /**
      * Retrieves a ranked list of anime based on the specified criteria.

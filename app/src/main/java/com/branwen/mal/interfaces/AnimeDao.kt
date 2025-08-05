@@ -17,14 +17,14 @@ import kotlinx.coroutines.flow.Flow
 interface AnimeDao {
     @Query(
         value = "SELECT * FROM anime_list " +
-                "ORDER BY LOWER(TITLE) ASC, " +
+                "ORDER BY " +
                 "CASE status " +
                 "   WHEN 'watching' THEN 1 " +
                 "   WHEN 'completed' THEN 2 " +
                 "   WHEN 'on_hold' THEN 3 " +
                 "   WHEN 'dropped' THEN 4 " +
                 "   ELSE 5 " +
-                "END"
+                "END, LOWER(TITLE) ASC"
     )
     fun getAll(): Flow<List<AnimeListEntity>>
 

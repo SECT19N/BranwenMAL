@@ -64,7 +64,8 @@ fun AnimeListScreenContent(
                         ListItem(
                             animeItem = item,
                             onItemClicked = { onItemClicked(item.id) },
-                            onProgressIncremented = { onProgressIncremented(item) })
+                            onProgressIncremented = { onProgressIncremented(item) }
+                        )
                     }
                 }
             }
