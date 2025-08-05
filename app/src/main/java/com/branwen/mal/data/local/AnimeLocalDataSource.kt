@@ -1,6 +1,5 @@
 package com.branwen.mal.data.local
 
-import com.branwen.mal.data.repo.UpdatedAnimeResponse
 import com.branwen.mal.interfaces.AnimeDao
 import com.branwen.mal.models.AnimeNode
 import com.branwen.mal.models.domain.MyAnimeListItem
