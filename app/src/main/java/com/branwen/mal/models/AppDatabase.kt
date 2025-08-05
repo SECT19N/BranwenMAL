@@ -3,6 +3,7 @@ package com.branwen.mal.models
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.branwen.mal.interfaces.AnimeDao
+import com.branwen.mal.interfaces.MangaDao
 import com.branwen.mal.models.entity.AnimeListEntity
 
 /**
@@ -21,4 +22,6 @@ import com.branwen.mal.models.entity.AnimeListEntity
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun animeDao(): AnimeDao
+
+    abstract fun mangaDao(): MangaDao
 }

@@ -4,9 +4,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
 import com.branwen.mal.data.local.AnimeLocalDataSource
+import com.branwen.mal.data.local.MangaLocalDataSource
 import com.branwen.mal.data.remote.AnimeRemoteDataSource
+import com.branwen.mal.data.remote.MangaRemoteDataSource
 import com.branwen.mal.data.repo.AnimeRepository
+import com.branwen.mal.data.repo.MangaRepository
 import com.branwen.mal.interfaces.AnimeDao
+import com.branwen.mal.interfaces.MangaDao
 import com.branwen.mal.models.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -33,16 +37,32 @@ object AppModule {
     fun provideAnimeDao(db: AppDatabase): AnimeDao = db.animeDao()
 
     @Provides
-    fun provideRemote(sharedPrefs: SharedPreferences): AnimeRemoteDataSource =
+    fun provideAnimeRemote(sharedPrefs: SharedPreferences): AnimeRemoteDataSource =
         AnimeRemoteDataSource(sharedPrefs)
 
     @Provides
-    fun provideLocal(animeDao: AnimeDao): AnimeLocalDataSource = AnimeLocalDataSource(animeDao)
+    fun provideAnimeLocal(animeDao: AnimeDao): AnimeLocalDataSource = AnimeLocalDataSource(animeDao)
 
     @Provides
     @Singleton
-    fun provideRepo(
+    fun provideAnimeRepo(
         remote: AnimeRemoteDataSource,
         local: AnimeLocalDataSource
     ): AnimeRepository = AnimeRepository(remote, local)
+
+    @Provides
+    fun provideMangaDao(db: AppDatabase): MangaDao = db.mangaDao()
+
+    @Provides
+    fun provideMangaRemote(sharedPrefs: SharedPreferences): MangaRemoteDataSource = MangaRemoteDataSource(sharedPrefs)
+
+    @Provides
+    fun provideMangaLocal(mangaDao: MangaDao): MangaLocalDataSource = MangaLocalDataSource(mangaDao)
+
+    @Provides
+    @Singleton
+    fun provideMangaRepo(
+        remote: MangaRemoteDataSource,
+        local: MangaLocalDataSource
+    ): MangaRepository = MangaRepository(remote, local)
 }

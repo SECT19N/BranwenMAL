@@ -19,7 +19,7 @@ data class AnimeListItem(
 data class AnimeNode(
     val id: Int,
     val title: String,
-    @param:Json(name = "main_picture") val mainPicture: PictureSource,
+    @param:Json(name = "main_picture") val mainPicture: Picture,
     @param:Json(name = "alternative_titles") val alternativeTitles: AlternativeTitles? = null,
     @param:Json(name = "start_date") val startDate: String? = null,
     @param:Json(name = "end_date") val endDate: String? = null,
@@ -42,7 +42,7 @@ data class AnimeNode(
     val source: String? = null,
     @param:Json(name = "average_episode_duration") val averageEpisodeDuration: Int? = null,  // in seconds
     val rating: String? = null,
-    val pictures: List<PictureSource>? = null,
+    val pictures: List<Picture>? = null,
     val background: String? = null,
     @param:Json(name = "related_anime") val relatedAnime: List<AnimeListItem>? = null, // TODO - add related manga
     val recommendations: List<AnimeListItem>? = null,
@@ -92,7 +92,7 @@ data class AlternativeTitles(
     val ja: String? = null
 )
 
-data class PictureSource(
+data class Picture(
     val medium: String,
     val large: String
 )
