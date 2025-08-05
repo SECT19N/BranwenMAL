@@ -1,11 +1,11 @@
 package com.branwen.mal.data.remote
 
 import android.content.SharedPreferences
-import com.branwen.mal.data.repo.UpdatedAnimeResponse
 import com.branwen.mal.models.AnimeListItem
 import com.branwen.mal.models.AnimeNode
 import com.branwen.mal.models.Picture
 import com.branwen.mal.models.domain.MyAnimeListItem
+import com.branwen.mal.models.remote.UpdatedAnimeResponse
 import com.branwen.mal.utils.MalServiceBuilder
 
 /**

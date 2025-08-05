@@ -10,10 +10,14 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -83,9 +87,18 @@ fun MyListScreen(
                         checkedState = it
                     },
                     thumbContent = {
-                        Text(
-                            text = if (checkedState) "A" else "M"
-                        )
+                        TooltipBox(
+                            modifier = Modifier,
+                            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                            tooltip = {
+                                PlainTooltip { Text("List Type") }
+                            },
+                            state = rememberTooltipState()
+                        ) {
+                            Text(
+                                text = if (checkedState) "A" else "M"
+                            )
+                        }
                     },
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 0.dp)
                 )
