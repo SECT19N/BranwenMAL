@@ -66,6 +66,34 @@ interface MalApi {
     ): AnimeListResponse
 
     /**
+     * Retrieves the manga list for the authenticated user.
+     *
+     * This function makes a GET request to the "v2/users/@me/mangalist" endpoint
+     * of the MyAnimeList API. It allows fetching a paginated list of manga
+     * present in the user's list, with options to filter by status, sort the results,
+     * and specify which fields to return for each manga.
+     *
+     * @param limit The maximum number of items to return in a single response. Defaults to 100.
+     * @param offset The number of items to skip from the beginning of the list. Used for pagination. Defaults to 0.
+     * @param status Filters the list by manga status. Possible values include "reading", "completed", "on_hold", "dropped", "plan_to_read". If null, no status filter is applied. Defaults to null.
+     * @param sort Specifies the sorting criteria for the returned list. Defaults to "manga_title".
+     *             Other possible values include "list_score", "list_updated_at", "manga_start_date", "manga_id".
+     * @param fields A comma-separated string of fields to include in the response for each manga.
+     *               Defaults to "list_status,num_volumes,num_chapters,start_date".
+     *               Refer to the MyAnimeList API documentation for a full list of available fields.
+     * @return [AnimeListResponse] An object containing the list of manga and pagination information.
+     *                           // TODO: Create a separate MangaListResponse class for better type safety and clarity.
+     */
+    @GET("v2/users/@me/mangalist")
+    suspend fun getUserMangaList(
+        @Query("limit") limit: Int = 100,
+        @Query("offset") offset: Int = 0,
+        @Query("status") status: String? = null,
+        @Query("sort") sort: String = "manga_title",
+        @Query("fields") fields: String = "list_status,num_volumes,num_chapters,start_date"
+    ): AnimeListResponse // TODO create a separate class for MangaListResponse
+
+    /**
      * Updates the status of an anime in the user's list.
      *
      * @param animeId The ID of the anime to update.
