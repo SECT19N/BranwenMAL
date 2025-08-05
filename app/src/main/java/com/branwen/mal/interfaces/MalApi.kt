@@ -1,9 +1,9 @@
 package com.branwen.mal.interfaces
 
-import com.branwen.mal.data.repo.UpdatedAnimeResponse
 import com.branwen.mal.models.AnimeListResponse
 import com.branwen.mal.models.AnimeNode
 import com.branwen.mal.models.ListStatus
+import com.branwen.mal.models.remote.UpdatedAnimeResponse
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
