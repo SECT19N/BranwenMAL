@@ -7,12 +7,12 @@ import com.squareup.moshi.JsonClass
 data class UpdatedAnimeResponse(
     val status: String,
     val score: Int,
-    @Json(name = "num_episodes_watched") val numEpisodesWatched: Int,
-    @Json(name = "is_rewatching") val isRewatching: Boolean,
-    @Json(name = "updated_at") val updatedAt: String,
+    @param:Json(name = "num_episodes_watched") val numEpisodesWatched: Int,
+    @param:Json(name = "is_rewatching") val isRewatching: Boolean,
+    @param:Json(name = "updated_at") val updatedAt: String,
     val priority: Int,
-    @Json(name = "num_times_rewatched") val numTimesRewatched: Int,
-    @Json(name = "rewatch_value") val rewatchValue: Int,
+    @param:Json(name = "num_times_rewatched") val numTimesRewatched: Int,
+    @param:Json(name = "rewatch_value") val rewatchValue: Int,
     val tags: List<String>,
     val comments: String
 )
