@@ -45,7 +45,7 @@ fun AnimeListScreenContent(
         PullToRefreshBox(
             state = pullState,
             isRefreshing = isRefreshing,
-            onRefresh = { onRefresh },
+            onRefresh = { onRefresh() },
             modifier = Modifier.fillMaxSize()
         ) {
             if (loading) {
