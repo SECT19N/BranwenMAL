@@ -3,7 +3,7 @@ package com.branwen.mal.data.remote
 import android.content.SharedPreferences
 import com.branwen.mal.models.AnimeListItem
 import com.branwen.mal.models.AnimeNode
-import com.branwen.mal.models.Picture
+import com.branwen.mal.models.PictureSource
 import com.branwen.mal.models.domain.MyAnimeListItem
 import com.branwen.mal.models.remote.UpdatedAnimeResponse
 import com.branwen.mal.utils.MalServiceBuilder
@@ -57,7 +57,7 @@ class AnimeRemoteDataSource(
             ?: return AnimeNode(
                 id = animeId,
                 title = "N/A",
-                mainPicture = Picture("N/A", "N/A")
+                mainPicture = PictureSource("N/A", "N/A")
             )
 
         return MalServiceBuilder.provideMalApiService(token).getAnimeDetails(animeId)

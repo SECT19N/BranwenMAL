@@ -4,6 +4,7 @@ import com.branwen.mal.models.AnimeListResponse
 import com.branwen.mal.models.AnimeNode
 import com.branwen.mal.models.ListStatus
 import com.branwen.mal.models.remote.UpdatedAnimeResponse
+import com.branwen.mal.models.remote.manga.MangaListResponse
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -65,6 +66,7 @@ interface MalApi {
         @Query("fields") fields: String = "list_status,num_episodes,start_season"
     ): AnimeListResponse
 
+
     /**
      * Retrieves the manga list for the authenticated user.
      *
@@ -81,8 +83,7 @@ interface MalApi {
      * @param fields A comma-separated string of fields to include in the response for each manga.
      *               Defaults to "list_status,num_volumes,num_chapters,start_date".
      *               Refer to the MyAnimeList API documentation for a full list of available fields.
-     * @return [AnimeListResponse] An object containing the list of manga and pagination information.
-     *                           // TODO: Create a separate MangaListResponse class for better type safety and clarity.
+     * @return [MangaListResponse] An object containing the list of manga and pagination information.
      */
     @GET("v2/users/@me/mangalist")
     suspend fun getUserMangaList(
@@ -90,8 +91,8 @@ interface MalApi {
         @Query("offset") offset: Int = 0,
         @Query("status") status: String? = null,
         @Query("sort") sort: String = "manga_title",
-        @Query("fields") fields: String = "list_status,num_volumes,num_chapters,start_date"
-    ): AnimeListResponse // TODO create a separate class for MangaListResponse
+        @Query("fields") fields: String = "list_status,num_volumes,num_chapters,start_date,media_type"
+    ): MangaListResponse
 
     /**
      * Updates the status of an anime in the user's list.
