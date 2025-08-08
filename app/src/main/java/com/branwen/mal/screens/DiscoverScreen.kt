@@ -52,11 +52,11 @@ fun DiscoverScreen(
     navController: NavController,
     viewModel: DiscoverViewModel = viewModel()
 ) {
-    val topTenAnime = viewModel.topTenAnime.collectAsState()
-    val topTenAiringAnime = viewModel.topTenAiringAnime.collectAsState()
-    val topTenUpcomingAnime = viewModel.topTenUpcomingAnime.collectAsState()
-    val topTenMovies = viewModel.topTenMovies.collectAsState()
-    val tenSuggestedAnime = viewModel.tenSuggestedAnime.collectAsState()
+    val topTenAnime = viewModel.discoverUIState.collectAsState().value.topTenMovies
+    val topTenAiringAnime = viewModel.discoverUIState.collectAsState().value.topTenAiringAnime
+    val topTenUpcomingAnime = viewModel.discoverUIState.collectAsState().value.topTenUpcomingAnime
+    val topTenMovies = viewModel.discoverUIState.collectAsState().value.topTenMovies
+    val tenSuggestedAnime = viewModel.discoverUIState.collectAsState().value.tenSuggestedAnime
 
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState())
@@ -76,7 +76,7 @@ fun DiscoverScreen(
 
         Text("Top 10 Anime")
 
-        CenterHeroCarousel(topTenAnime.value) { animeId ->
+        CenterHeroCarousel(topTenAnime) { animeId ->
             navController.navigate("anime_details/$animeId")
         }
 
@@ -84,7 +84,7 @@ fun DiscoverScreen(
 
         Text("Top 10 Airing")
 
-        CenterHeroCarousel(topTenAiringAnime.value) { animeId ->
+        CenterHeroCarousel(topTenAiringAnime) { animeId ->
             navController.navigate("anime_details/$animeId")
         }
 
@@ -92,7 +92,7 @@ fun DiscoverScreen(
 
         Text("Top 10 Upcoming")
 
-        CenterHeroCarousel(topTenUpcomingAnime.value) { animeId ->
+        CenterHeroCarousel(topTenUpcomingAnime) { animeId ->
             navController.navigate("anime_details/$animeId")
         }
 
@@ -100,7 +100,7 @@ fun DiscoverScreen(
 
         Text("Top 10 Movies")
 
-        CenterHeroCarousel(topTenMovies.value) { animeId ->
+        CenterHeroCarousel(topTenMovies) { animeId ->
             navController.navigate("anime_details/$animeId")
         }
 
@@ -108,7 +108,7 @@ fun DiscoverScreen(
 
         Text("Top 10 Suggested For You")
 
-        CenterHeroCarousel(tenSuggestedAnime.value) { animeId ->
+        CenterHeroCarousel(tenSuggestedAnime) { animeId ->
             navController.navigate("anime_details/$animeId")
         }
     }

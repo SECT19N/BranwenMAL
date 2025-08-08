@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -32,20 +33,34 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.branwen.mal.models.AnimeListItem
+import com.branwen.mal.models.domain.MyAnimeListItem
 
 @Composable
 fun ListItem(
-    animeItem: AnimeListItem
+    animeItem: MyAnimeListItem,
+    onItemClicked: (Int) -> Unit,
+    onProgressIncremented: (MyAnimeListItem) -> Unit,
 ) {
-    val borderColor = statusToColor(animeItem.listStatus?.status ?: "plan_to_watch")
+    val borderColor = statusToColor(animeItem.status)
 
-    Card {
-        Row(
-            modifier = Modifier
-                .height(164.dp)
-                .fillMaxWidth(),
-        ) {
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        onClick = { onItemClicked(animeItem.id) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(164.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp,
+            pressedElevation = 4.dp,
+            hoveredElevation = 3.dp,
+            focusedElevation = 4.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        )
+    ) {
+        Row {
             Column(
                 modifier = Modifier
                     .clip(
@@ -68,7 +83,7 @@ fun ListItem(
                     )
             ) {
                 AsyncImage(
-                    model = animeItem.node.mainPicture.medium ?: "", // fallback empty
+                    model = animeItem.imageUrl, // fallback empty
                     contentDescription = null,
                     modifier = Modifier
                         .width(120.dp)
@@ -80,21 +95,16 @@ fun ListItem(
             Column(modifier = Modifier.padding(12.dp)) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = animeItem.node.title ?: "Untitled",
+                        text = animeItem.title,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    animeItem.node.startSeason?.let { season ->
-                        Text(
-                            text = "${season.season}, ${season.year}",
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 12.sp
-                        )
-                    } ?: Text(
-                        text = "Season unknown",
+                    Text(
+                        text = "${animeItem.startSeason}, ${animeItem.startYear}",
+                        fontWeight = FontWeight.SemiBold,
                         fontSize = 12.sp
                     )
                 }
@@ -115,17 +125,23 @@ fun ListItem(
                             )
                         }
 
-                        IconButton(onClick = { /*TODO*/ }) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
+                        animeItem.totalEpisodes?.let {
+                            if (animeItem.numEpisodesWatched < it) {
+                                IconButton(
+                                    onClick = { onProgressIncremented(animeItem) }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                    )
+                                }
+                            }
                         }
                     }
 
-                    val watched = animeItem.listStatus?.numEpisodesWatched ?: 0
-                    val totalEpisodes = animeItem.node.numEpisodes ?: 0
+                    val watched = animeItem.numEpisodesWatched
+                    val totalEpisodes = animeItem.totalEpisodes ?: 0
                     val progress = if (totalEpisodes == 0) {
                         if (watched == 0) 0f else 0.5f
                     } else {
@@ -162,7 +178,7 @@ fun ListItem(
                                     .height(24.dp)
                             )
                             Text(
-                                text = animeItem.listStatus?.score?.toString() ?: "0",
+                                text = animeItem.rating.toString(),
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary.copy(0.9f),
                                 fontSize = 12.sp
@@ -190,7 +206,6 @@ fun ListItem(
         }
     }
 }
-
 
 fun statusToColor(status: String): Color {
     return when (status.lowercase()) {

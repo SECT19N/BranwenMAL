@@ -1,57 +1,98 @@
 package com.branwen.mal.viewmodels
 
-import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.branwen.mal.data.repo.AnimeListRepository
-import com.branwen.mal.models.AnimeListItem
-import kotlinx.coroutines.Dispatchers
+import com.branwen.mal.data.repo.AnimeRepository
+import com.branwen.mal.models.domain.MyAnimeListItem
+import com.branwen.mal.utils.launchCatching
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MyListViewModel(
-    private val repository: AnimeListRepository
+/**
+ * ViewModel for the My List screen.
+ *
+ * This ViewModel is responsible for fetching and managing the user's anime list,
+ * handling loading and refreshing states, and filtering the list based on status.
+ *
+ * @property repository The [AnimeRepository] used to fetch anime data.
+ */
+@HiltViewModel
+class MyListViewModel @Inject constructor(
+    private val repository: AnimeRepository,
 ) : ViewModel() {
-    private val _animeList = MutableStateFlow<List<AnimeListItem>>(emptyList())
-    val animeList: StateFlow<List<AnimeListItem>> = _animeList
+    private val _loading = MutableStateFlow(true)
+    val loading: StateFlow<Boolean> = _loading
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
     private val _selectedStatus = MutableStateFlow("all")
     val selectedStatus: StateFlow<String> = _selectedStatus
 
-    val filteredAnimeList: StateFlow<List<AnimeListItem>> = combine(
+    private val _animeList = MutableStateFlow<List<MyAnimeListItem>>(emptyList())
+    val filteredAnimeList: StateFlow<List<MyAnimeListItem>> = combine(
         _animeList, _selectedStatus
     ) { fullList, status ->
         if (status == "all") {
             fullList
         } else {
-            fullList.filter { it.listStatus?.status == status }
+            fullList.filter { it.status == status }
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    }.stateIn(
+        scope = viewModelScope, started = SharingStarted.WhileSubscribed(), initialValue = emptyList()
+    )
+
+    private val _listSwitchChecked = mutableStateOf(true)
+    val listSwitchChecked = _listSwitchChecked
 
     init {
-        fetchAnimeList()
+        observeLocal()
+        fetchAnimeList(isInitial = true)
     }
 
-    fun refreshAnimeList() {
-        fetchAnimeList(forceRefresh = true)
-    }
-
-    private fun fetchAnimeList(forceRefresh: Boolean = false) {
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                _animeList.value = repository.getAnimeList()
-            }.onFailure {
-                Log.e("MyListViewModel", "Error fetching anime list", it)
+    private fun observeLocal() {
+        launchCatching(
+            block = {
+                repository.getAnimeListFlow().collect { list ->
+                    _animeList.value = list
+                }
             }
-        }
+        )
+    }
+
+    private fun fetchAnimeList(isInitial: Boolean = false) {
+        launchCatching(
+            block = {
+                if (isInitial) _loading.value = true
+                repository.fetchAndCacheAnimeList()
+            },
+            post = {
+                if (isInitial) _loading.value = false
+                else _isRefreshing.value = false
+            }
+        )
+    }
+
+    fun onPullToRefresh() {
+        _isRefreshing.value = true
+        fetchAnimeList(isInitial = false)
     }
 
     fun onStatusSelected(status: String) {
         _selectedStatus.value = status
+    }
+
+    fun onProgressIncrement(animeItem: MyAnimeListItem) {
+        launchCatching(
+            block = {
+                repository.incrementAnimeListStatus(animeItem)
+            }
+        )
     }
 }

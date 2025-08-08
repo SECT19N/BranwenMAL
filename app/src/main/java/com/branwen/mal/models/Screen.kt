@@ -22,5 +22,5 @@ import androidx.compose.ui.graphics.vector.ImageVector
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     object Home : Screen("home", "Home", Icons.Default.Home)
     object Search : Screen("discover", "Discover", Icons.Default.Search)
-    object MyList : Screen("mylist", "My List", Icons.AutoMirrored.Filled.List)
+    object MyList : Screen("my_list", "My List", Icons.AutoMirrored.Filled.List)
 }

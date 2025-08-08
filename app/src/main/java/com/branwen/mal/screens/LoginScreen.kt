@@ -1,6 +1,5 @@
 package com.branwen.mal.screens
 
-import android.util.Log
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +13,7 @@ import androidx.core.net.toUri
 import androidx.navigation.NavController
 import com.branwen.mal.BuildConfig
 import com.branwen.mal.utils.PKCE
+import timber.log.Timber
 
 @Composable
 fun LoginScreen(
@@ -40,7 +40,7 @@ fun LoginScreen(
 fun buildAuthUrl(): String {
     val clientId = BuildConfig.clientId
     PKCE.generateCodeVerifier()
-    Log.d("BranwenMAL", "2, ${PKCE.codeVerifier}")
+    Timber.d("Code Verifier: ${PKCE.codeVerifier}")
     val codeChallenge = PKCE.generateCodeChallenge(PKCE.codeVerifier!!)
     return "https://myanimelist.net/v1/oauth2/authorize" +
             "?response_type=code" +

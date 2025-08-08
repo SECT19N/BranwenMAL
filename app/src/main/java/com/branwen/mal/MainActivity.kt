@@ -2,7 +2,6 @@ package com.branwen.mal
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -14,12 +13,18 @@ import androidx.navigation.compose.rememberNavController
 import com.branwen.mal.ui.theme.BranwenMALTheme
 import com.branwen.mal.utils.AppNavigation
 import com.branwen.mal.utils.PKCE
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
+import timber.log.Timber
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
 
@@ -40,10 +45,10 @@ class MainActivity : ComponentActivity() {
 
 
         intent.data?.let { uri ->
-            Log.d("BranwenMAL", "Received deep link: $uri")
+            Timber.d("Received deep link: $uri")
 
             uri.getQueryParameter("code")?.let { code ->
-                Log.d("BranwenMAL", "Auth code: $code")
+                Timber.d("Auth code: $code")
 
                 // Exchange code for token
                 lifecycleScope.launch {
@@ -51,19 +56,13 @@ class MainActivity : ComponentActivity() {
                         val prefs = getSharedPreferences("bran_mal_prefs", MODE_PRIVATE)
                         val authService = provideAuthService()
 
-                        Log.d("BranwenMAL", "1, $code")
-
                         val codeVerifier = PKCE.codeVerifier ?: return@launch
-
-                        Log.d("BranwenMAL", "2, $codeVerifier!!")
 
                         val tokenResponse = authService.exchangeToken(
                             clientId = BuildConfig.clientId,
                             code = code,
                             codeVerifier = codeVerifier
                         )
-
-                        Log.d("BranwenMAL", "3, $tokenResponse")
 
                         // Save to SharedPreferences
                         prefs.edit {
@@ -72,15 +71,13 @@ class MainActivity : ComponentActivity() {
                                 .putLong("expires_at", System.currentTimeMillis() + (tokenResponse.expiresIn * 1000L))
                         }
 
-                        Log.d("BranwenMAL", "Token saved!")
-
                         // Navigate to main screen
                         navController.navigate("splash") {
                             popUpTo("login") { inclusive = true }
                         }
 
                     } catch (e: Exception) {
-                        Log.e("BranwenMAL", "Token exchange failed", e)
+                        Timber.e(e, "Token exchange failed")
                     }
                 }
             }
@@ -88,9 +85,13 @@ class MainActivity : ComponentActivity() {
     }
 
     fun provideAuthService(): MalAuthService {
+        val moshi = Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+
         val retrofit = retrofit2.Retrofit.Builder()
             .baseUrl("https://myanimelist.net")
-            .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
 
         return retrofit.create(MalAuthService::class.java)
@@ -109,7 +110,7 @@ interface MalAuthService {
 }
 
 data class TokenResponse(
-    @SerializedName("expires_in") val expiresIn: Int,
-    @SerializedName("access_token") val accessToken: String,
-    @SerializedName("refresh_token") val refreshToken: String
+    @param:Json(name = "expires_in") val expiresIn: Int,
+    @param:Json(name = "access_token") val accessToken: String,
+    @param:Json(name = "refresh_token") val refreshToken: String
 )
