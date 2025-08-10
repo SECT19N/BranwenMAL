@@ -13,7 +13,8 @@ data class AnimeListItem(
     val node: AnimeNode,
     @param:Json(name = "list_status") val listStatus: ListStatus?,
     val ranking: Ranking?,
-    @param:Json(name = "num_recommendations") val numRecommendations: Int? = null
+    @param:Json(name = "num_recommendations") val numRecommendations: Int? = null,
+    @param:Json(name = "relation_type_formatted") val relationTypeFormatted: String?,
 )
 
 data class AnimeNode(
@@ -81,22 +82,6 @@ data class Broadcast(
     @param:Json(name = "start_time") val startTime: String
 )
 
-data class Genre(
-    val id: Int,
-    val name: String
-)
-
-data class AlternativeTitles(
-    val synonyms: List<String>? = null,
-    val en: String? = null,
-    val ja: String? = null
-)
-
-data class PictureSource(
-    val medium: String,
-    val large: String
-)
-
 data class StartSeason(
     val year: Int = 0,
     val season: String = "N/A"
@@ -112,8 +97,4 @@ data class ListStatus(
 
 data class Ranking(
     val rank: Int
-)
-
-data class Paging(
-    val next: String?,
 )
