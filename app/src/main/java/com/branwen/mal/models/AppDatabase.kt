@@ -5,6 +5,7 @@ import androidx.room.RoomDatabase
 import com.branwen.mal.interfaces.AnimeDao
 import com.branwen.mal.interfaces.MangaDao
 import com.branwen.mal.models.entity.AnimeListEntity
+import com.branwen.mal.models.entity.MangaListEntity
 
 /**
  * Room database for the application.
@@ -16,7 +17,7 @@ import com.branwen.mal.models.entity.AnimeListEntity
  * @property animeDao Provides access to the anime data stored in the database.
  */
 @Database(
-    entities = [AnimeListEntity::class],
+    entities = [AnimeListEntity::class, MangaListEntity::class],
     version = 1,
     exportSchema = false
 )

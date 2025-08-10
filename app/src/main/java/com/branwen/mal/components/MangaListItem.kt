@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -34,18 +33,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.branwen.mal.models.domain.MyAnimeListItem
+import com.branwen.mal.models.domain.MyMangaListItem
 
 @Composable
-fun ListItem(
-    animeItem: MyAnimeListItem,
+fun MangaListItem(
+    mangaItem: MyMangaListItem,
     onItemClicked: (Int) -> Unit,
     onProgressIncremented: (MyAnimeListItem) -> Unit,
 ) {
-    val borderColor = statusToColor(animeItem.status)
+    val borderColor = statusToColor(mangaItem.status)
 
     Card(
         shape = RoundedCornerShape(12.dp),
-        onClick = { onItemClicked(animeItem.id) },
+        onClick = { /* TODO */ },
         modifier = Modifier
             .fillMaxWidth()
             .height(164.dp),
@@ -83,7 +83,7 @@ fun ListItem(
                     )
             ) {
                 AsyncImage(
-                    model = animeItem.imageUrl, // fallback empty
+                    model = mangaItem.imageUrl, // fallback empty
                     contentDescription = null,
                     modifier = Modifier
                         .width(120.dp)
@@ -95,7 +95,7 @@ fun ListItem(
             Column(modifier = Modifier.padding(12.dp)) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = animeItem.title,
+                        text = mangaItem.title,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         maxLines = 1,
@@ -103,7 +103,7 @@ fun ListItem(
                     )
 
                     Text(
-                        text = "${animeItem.startSeason}, ${animeItem.startYear}",
+                        text = mangaItem.startYear,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 12.sp
                     )
@@ -125,10 +125,10 @@ fun ListItem(
                             )
                         }
 
-                        animeItem.totalEpisodes?.let {
-                            if (animeItem.numEpisodesWatched < it) {
+                        mangaItem.totalChapters?.let {
+                            if (mangaItem.numChaptersRead < it) {
                                 IconButton(
-                                    onClick = { onProgressIncremented(animeItem) }
+                                    onClick = { /* TODO */ }
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Add,
@@ -140,8 +140,8 @@ fun ListItem(
                         }
                     }
 
-                    val watched = animeItem.numEpisodesWatched
-                    val totalEpisodes = animeItem.totalEpisodes ?: 0
+                    val watched = mangaItem.numChaptersRead
+                    val totalEpisodes = mangaItem.totalChapters ?: 0
                     val progress = if (totalEpisodes == 0) {
                         if (watched == 0) 0f else 0.5f
                     } else {
@@ -178,7 +178,7 @@ fun ListItem(
                                     .height(24.dp)
                             )
                             Text(
-                                text = animeItem.rating.toString(),
+                                text = mangaItem.rating.toString(),
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary.copy(0.9f),
                                 fontSize = 12.sp
@@ -204,15 +204,5 @@ fun ListItem(
                 }
             }
         }
-    }
-}
-
-fun statusToColor(status: String): Color {
-    return when (status.lowercase()) {
-        "watching" -> Color(0xFF4CD137)
-        "completed" -> Color(0xFF00A8FF)
-        "on_hold" -> Color(0xFFFBC531)
-        "dropped" -> Color(0xFFE84118)
-        else -> Color(0xFF707070) // default & plan to watch
     }
 }

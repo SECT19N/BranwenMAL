@@ -12,16 +12,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.branwen.mal.ui.theme.BranwenMALTheme
 import com.branwen.mal.utils.AppNavigation
+import com.branwen.mal.utils.MalServiceBuilder.provideAuthService
 import com.branwen.mal.utils.PKCE
-import com.squareup.moshi.Json
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.POST
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -42,7 +36,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-
 
         intent.data?.let { uri ->
             Timber.d("Received deep link: $uri")
@@ -83,34 +76,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    fun provideAuthService(): MalAuthService {
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-
-        val retrofit = retrofit2.Retrofit.Builder()
-            .baseUrl("https://myanimelist.net")
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
-
-        return retrofit.create(MalAuthService::class.java)
-    }
 }
-
-interface MalAuthService {
-    @FormUrlEncoded
-    @POST("/v1/oauth2/token")
-    suspend fun exchangeToken(
-        @Field("grant_type") grantType: String = "authorization_code",
-        @Field("client_id") clientId: String,
-        @Field("code") code: String,
-        @Field("code_verifier") codeVerifier: String,
-    ): TokenResponse
-}
-
-data class TokenResponse(
-    @param:Json(name = "expires_in") val expiresIn: Int,
-    @param:Json(name = "access_token") val accessToken: String,
-    @param:Json(name = "refresh_token") val refreshToken: String
-)
