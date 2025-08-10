@@ -15,10 +15,10 @@ interface MangaDao {
                 "CASE status " +
                 "   WHEN 'reading' THEN 1 " +
                 "   WHEN 'completed' THEN 2 " +
-                "   WHEN 'on_hold' THEN 3" +
-                "   WHEN 'dropped' THEN 4" +
+                "   WHEN 'on_hold' THEN 3 " +
+                "   WHEN 'dropped' THEN 4 " +
                 "ELSE 5 " +
-                "END, LOWER(title) ASC"
+                "END, LOWER(TITLE) ASC"
     )
     fun getAll(): Flow<List<MangaListEntity>>
 

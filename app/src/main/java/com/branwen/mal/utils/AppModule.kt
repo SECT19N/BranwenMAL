@@ -2,6 +2,7 @@ package com.branwen.mal.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.room.Room
 import com.branwen.mal.data.local.AnimeLocalDataSource
 import com.branwen.mal.data.local.MangaLocalDataSource
@@ -10,6 +11,7 @@ import com.branwen.mal.data.remote.MangaRemoteDataSource
 import com.branwen.mal.data.repo.AnimeRepository
 import com.branwen.mal.data.repo.MangaRepository
 import com.branwen.mal.interfaces.AnimeDao
+import com.branwen.mal.interfaces.MalApi
 import com.branwen.mal.interfaces.MangaDao
 import com.branwen.mal.models.AppDatabase
 import dagger.Module
@@ -33,6 +35,27 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideMalApi(
+        prefs: SharedPreferences
+    ): MalApi {
+        return MalServiceBuilder.provideMalApiService(
+            accessTokenProvider = { prefs.getString("access_token", "") ?: "" },
+            refreshTokenProvider = { prefs.getString("refresh_token", "") ?: "" },
+            saveTokens = { tokens ->
+                prefs.edit {
+                    putString("access_token", tokens.accessToken)
+                    putString("refresh_token", tokens.refreshToken)
+                    putLong(
+                        "expires_at",
+                        System.currentTimeMillis() + (tokens.expiresIn * 1000L)
+                    )
+                }
+            }
+        )
+    }
+
+    @Provides
+    @Singleton
     fun provideDatabase(
         @ApplicationContext context: Context
     ): AppDatabase = Room.databaseBuilder(
@@ -48,8 +71,8 @@ object AppModule {
 
     @Provides
     fun provideAnimeRemote(
-        sharedPrefs: SharedPreferences
-    ): AnimeRemoteDataSource = AnimeRemoteDataSource(sharedPrefs)
+        malApi: MalApi
+    ): AnimeRemoteDataSource = AnimeRemoteDataSource(malApi)
 
     @Provides
     fun provideAnimeLocal(
@@ -70,8 +93,8 @@ object AppModule {
 
     @Provides
     fun provideMangaRemote(
-        sharedPrefs: SharedPreferences
-    ): MangaRemoteDataSource = MangaRemoteDataSource(sharedPrefs)
+        malApi: MalApi
+    ): MangaRemoteDataSource = MangaRemoteDataSource(malApi)
 
     @Provides
     fun provideMangaLocal(

@@ -1,9 +1,9 @@
 package com.branwen.mal.data.remote
 
 import android.content.SharedPreferences
+import com.branwen.mal.interfaces.MalApi
 import com.branwen.mal.models.domain.MyMangaListItem
 import com.branwen.mal.models.remote.manga.MangaListData
-import com.branwen.mal.utils.MalServiceBuilder
 
 /**
  * A data source for fetching manga-related data from the MyAnimeList (MAL) API.
@@ -18,7 +18,7 @@ import com.branwen.mal.utils.MalServiceBuilder
  * @property sharedPreferences An instance of [SharedPreferences] used to retrieve the access token.
  */
 class MangaRemoteDataSource(
-    private val sharedPreferences: SharedPreferences
+    private val malApi: MalApi,
 ) {
     private val statusOrder = listOf("reading", "completed", "on_hold", "dropped", "plan_to_read").withIndex()
         .associate { it.value to it.index }
@@ -35,15 +35,12 @@ class MangaRemoteDataSource(
      *         Returns an empty list if the access token is not found or if an error occurs during the API call.
      */
     suspend fun getMangaList(): List<MyMangaListItem> {
-        val token = sharedPreferences.getString("access_token", null) ?: return emptyList()
-        val service = MalServiceBuilder.provideMalApiService(token)
-
         val fullList = mutableListOf<MangaListData>()
         var offset = 0
         val limit = 100
 
         while (true) {
-            val response = service.getUserMangaList(limit = limit, offset = offset)
+            val response = malApi.getUserMangaList(limit = limit, offset = offset)
             val items = response.data
             if (items.isEmpty()) break
 

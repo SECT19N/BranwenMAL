@@ -1,12 +1,11 @@
 package com.branwen.mal.data.remote
 
 import android.content.SharedPreferences
+import com.branwen.mal.interfaces.MalApi
 import com.branwen.mal.models.AnimeListItem
 import com.branwen.mal.models.AnimeNode
-import com.branwen.mal.models.PictureSource
 import com.branwen.mal.models.domain.MyAnimeListItem
 import com.branwen.mal.models.remote.UpdatedAnimeResponse
-import com.branwen.mal.utils.MalServiceBuilder
 
 /**
  * Fetches anime data from the MyAnimeList (MAL) API.
@@ -18,7 +17,7 @@ import com.branwen.mal.utils.MalServiceBuilder
  * @property sharedPreferences An instance of [SharedPreferences] used to retrieve the MAL access token.
  */
 class AnimeRemoteDataSource(
-    private val sharedPreferences: SharedPreferences
+    private val malApi: MalApi
 ) {
     private val statusOrder = listOf("watching", "completed", "on_hold", "dropped", "plan_to_watch").withIndex()
         .associate { it.value to it.index }
@@ -27,15 +26,12 @@ class AnimeRemoteDataSource(
      * Get the anime list from the MAL API as a [List] of [MyAnimeListItem]
      */
     suspend fun getAnimeList(): List<MyAnimeListItem> {
-        val token = sharedPreferences.getString("access_token", null) ?: return emptyList()
-        val service = MalServiceBuilder.provideMalApiService(token)
-
         val fullList = mutableListOf<AnimeListItem>()
         var offset = 0
         val limit = 100
 
         while (true) {
-            val response = service.getUserAnimeList(limit = limit, offset = offset)
+            val response = malApi.getUserAnimeList(limit = limit, offset = offset)
             val items = response.data
             if (items.isEmpty()) break
 
@@ -53,38 +49,15 @@ class AnimeRemoteDataSource(
     }
 
     suspend fun getAnimeDetails(animeId: Int): AnimeNode {
-        val token = sharedPreferences.getString("access_token", null)
-            ?: return AnimeNode(
-                id = animeId,
-                title = "N/A",
-                mainPicture = PictureSource("N/A", "N/A")
-            )
-
-        return MalServiceBuilder.provideMalApiService(token).getAnimeDetails(animeId)
+        return malApi.getAnimeDetails(animeId)
     }
 
     suspend fun incrementAnimeListStatus(animeItem: MyAnimeListItem): UpdatedAnimeResponse {
-        val token = sharedPreferences.getString("access_token", null)
-            ?: return UpdatedAnimeResponse(
-                animeItem.status,
-                animeItem.rating,
-                animeItem.numEpisodesWatched,
-                false,
-                "", // TODO localdatetime needs api 26
-                0,
-                0,
-                0,
-                emptyList<String>(),
-                ""
-            )
-
-        val service = MalServiceBuilder.provideMalApiService(token)
-
         val newEpisodesWatched = animeItem.numEpisodesWatched + 1
         val status = animeItem.status.ifEmpty { "watching" } // sensible default
         val score = animeItem.rating
 
-        return service.patchAnimeListStatus(
+        return malApi.patchAnimeListStatus(
             animeItem.id,
             status,
             score,
