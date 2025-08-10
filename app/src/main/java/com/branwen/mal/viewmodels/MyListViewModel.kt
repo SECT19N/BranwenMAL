@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.branwen.mal.data.repo.AnimeRepository
+import com.branwen.mal.data.repo.MangaRepository
 import com.branwen.mal.models.domain.MyAnimeListItem
 import com.branwen.mal.models.domain.MyMangaListItem
 import com.branwen.mal.utils.launchCatching
@@ -21,11 +22,12 @@ import javax.inject.Inject
  * This ViewModel is responsible for fetching and managing the user's anime list,
  * handling loading and refreshing states, and filtering the list based on status.
  *
- * @property repository The [AnimeRepository] used to fetch anime data.
+ * @property animeRepository The [AnimeRepository] used to fetch anime data.
  */
 @HiltViewModel
 class MyListViewModel @Inject constructor(
-    private val repository: AnimeRepository,
+    private val animeRepository: AnimeRepository,
+    private val mangaRepository: MangaRepository
 ) : ViewModel() {
     private val _loading = MutableStateFlow(true)
     val loading: StateFlow<Boolean> = _loading
@@ -67,14 +69,20 @@ class MyListViewModel @Inject constructor(
 
     init {
         observeLocal()
+
         fetchAnimeList(isInitial = true)
+        fetchMangaList()
     }
 
     private fun observeLocal() {
         launchCatching(
             block = {
-                repository.getAnimeListFlow().collect { list ->
+                animeRepository.getAnimeListFlow().collect { list ->
                     _animeList.value = list
+                }
+
+                mangaRepository.getMangaListFlow().collect { list ->
+                    _mangaList.value = list
                 }
             }
         )
@@ -84,7 +92,7 @@ class MyListViewModel @Inject constructor(
         launchCatching(
             block = {
                 if (isInitial) _loading.value = true
-                repository.fetchAndCacheAnimeList()
+                animeRepository.fetchAndCacheAnimeList()
             },
             post = {
                 if (isInitial) _loading.value = false
@@ -93,9 +101,24 @@ class MyListViewModel @Inject constructor(
         )
     }
 
+    private fun fetchMangaList() {
+        launchCatching(
+            block = {
+                mangaRepository.fetchAndCacheMangaList()
+            },
+            post = {
+                _isRefreshing.value = false
+            }
+        )
+    }
+
     fun onPullToRefresh() {
         _isRefreshing.value = true
-        fetchAnimeList(isInitial = false)
+
+        when (_listSwitchChecked.value) {
+            true -> fetchAnimeList(isInitial = false)
+            false -> fetchMangaList()
+        }
     }
 
     fun onStatusSelected(status: String) {
@@ -105,7 +128,7 @@ class MyListViewModel @Inject constructor(
     fun onProgressIncrement(animeItem: MyAnimeListItem) {
         launchCatching(
             block = {
-                repository.incrementAnimeListStatus(animeItem)
+                animeRepository.incrementAnimeListStatus(animeItem)
             }
         )
     }

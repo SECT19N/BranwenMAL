@@ -24,24 +24,37 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun provideSharedPrefs(@ApplicationContext context: Context): SharedPreferences =
-        context.getSharedPreferences("bran_mal_prefs", Context.MODE_PRIVATE)
+    fun provideSharedPrefs(
+        @ApplicationContext context: Context
+    ): SharedPreferences = context.getSharedPreferences(
+        "bran_mal_prefs",
+        Context.MODE_PRIVATE
+    )
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, "anime_db")
-            .fallbackToDestructiveMigration(false).build()
+    fun provideDatabase(
+        @ApplicationContext context: Context
+    ): AppDatabase = Room.databaseBuilder(
+        context,
+        AppDatabase::class.java,
+        "anime_db"
+    ).fallbackToDestructiveMigration(false).build()
 
     @Provides
-    fun provideAnimeDao(db: AppDatabase): AnimeDao = db.animeDao()
+    fun provideAnimeDao(
+        db: AppDatabase
+    ): AnimeDao = db.animeDao()
 
     @Provides
-    fun provideAnimeRemote(sharedPrefs: SharedPreferences): AnimeRemoteDataSource =
-        AnimeRemoteDataSource(sharedPrefs)
+    fun provideAnimeRemote(
+        sharedPrefs: SharedPreferences
+    ): AnimeRemoteDataSource = AnimeRemoteDataSource(sharedPrefs)
 
     @Provides
-    fun provideAnimeLocal(animeDao: AnimeDao): AnimeLocalDataSource = AnimeLocalDataSource(animeDao)
+    fun provideAnimeLocal(
+        animeDao: AnimeDao
+    ): AnimeLocalDataSource = AnimeLocalDataSource(animeDao)
 
     @Provides
     @Singleton
@@ -51,18 +64,23 @@ object AppModule {
     ): AnimeRepository = AnimeRepository(remote, local)
 
     @Provides
-    fun provideMangaDao(db: AppDatabase): MangaDao = db.mangaDao()
+    fun provideMangaDao(
+        db: AppDatabase
+    ): MangaDao = db.mangaDao()
 
     @Provides
-    fun provideMangaRemote(sharedPrefs: SharedPreferences): MangaRemoteDataSource = MangaRemoteDataSource(sharedPrefs)
+    fun provideMangaRemote(
+        sharedPrefs: SharedPreferences
+    ): MangaRemoteDataSource = MangaRemoteDataSource(sharedPrefs)
 
     @Provides
-    fun provideMangaLocal(mangaDao: MangaDao): MangaLocalDataSource = MangaLocalDataSource(mangaDao)
+    fun provideMangaLocal(
+        mangaDao: MangaDao
+    ): MangaLocalDataSource = MangaLocalDataSource(mangaDao)
 
     @Provides
     @Singleton
     fun provideMangaRepo(
-        remote: MangaRemoteDataSource,
-        local: MangaLocalDataSource
+        remote: MangaRemoteDataSource, local: MangaLocalDataSource
     ): MangaRepository = MangaRepository(remote, local)
 }
