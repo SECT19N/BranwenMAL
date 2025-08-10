@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.branwen.mal.data.repo.AnimeRepository
 import com.branwen.mal.models.domain.MyAnimeListItem
+import com.branwen.mal.models.domain.MyMangaListItem
 import com.branwen.mal.utils.launchCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +39,19 @@ class MyListViewModel @Inject constructor(
     private val _animeList = MutableStateFlow<List<MyAnimeListItem>>(emptyList())
     val filteredAnimeList: StateFlow<List<MyAnimeListItem>> = combine(
         _animeList, _selectedStatus
+    ) { fullList, status ->
+        if (status == "all") {
+            fullList
+        } else {
+            fullList.filter { it.status == status }
+        }
+    }.stateIn(
+        scope = viewModelScope, started = SharingStarted.WhileSubscribed(), initialValue = emptyList()
+    )
+
+    private val _mangaList = MutableStateFlow<List<MyMangaListItem>>(emptyList())
+    val filteredMangaList: StateFlow<List<MyMangaListItem>> = combine(
+        _mangaList, _selectedStatus
     ) { fullList, status ->
         if (status == "all") {
             fullList

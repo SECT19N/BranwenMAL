@@ -26,7 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.branwen.mal.components.AnimeListScreenContent
+import com.branwen.mal.components.MyListScreenContent
 import com.branwen.mal.components.StatusFilterChips
 import com.branwen.mal.viewmodels.MyListViewModel
 
@@ -50,6 +50,7 @@ fun MyListScreen(
 ) {
     val selectedStatus by viewModel.selectedStatus.collectAsState()
     val filteredAnimeList by viewModel.filteredAnimeList.collectAsState()
+    val filteredMangaList by viewModel.filteredMangaList.collectAsState()
 
     val loading by viewModel.loading.collectAsState()
 
@@ -108,17 +109,20 @@ fun MyListScreen(
 
         StatusFilterChips(
             selectedStatus = selectedStatus,
+            checkedState = checkedState,
             onStatusSelected = { status ->
                 viewModel.onStatusSelected(status)
             }
         )
 
-        AnimeListScreenContent(
+        MyListScreenContent(
             isRefreshing = isRefreshing,
             loading = loading,
             filteredAnimeList = filteredAnimeList,
+            filteredMangaList = filteredMangaList,
             pullState = pullState,
             listState = listState,
+            checkedState = checkedState,
             onRefresh = { viewModel.onPullToRefresh() },
             onItemClicked = { id -> navigate(id) },
             onProgressIncremented = { anime ->
