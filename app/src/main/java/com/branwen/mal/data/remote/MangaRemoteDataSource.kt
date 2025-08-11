@@ -5,6 +5,7 @@ import android.util.Log
 import com.branwen.mal.interfaces.MalApi
 import com.branwen.mal.models.domain.MyMangaListItem
 import com.branwen.mal.models.remote.manga.MangaListData
+import timber.log.Timber
 
 /**
  * A data source for fetching manga-related data from the MyAnimeList (MAL) API.
@@ -58,7 +59,7 @@ class MangaRemoteDataSource(
                 .sortedBy { statusOrder[it.listStatus?.status] ?: Int.MAX_VALUE }
                 .toDomain()
         } catch (e: Exception) {
-            Log.e("MangaRemoteDataSource", "Failed to get manga list ${e.message}")
+            Timber.e("Failed to get manga list ${e.message}")
         }
 
         return emptyList()
