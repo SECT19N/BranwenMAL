@@ -34,7 +34,7 @@ data class MangaNode(
     @param:Json(name = "media_type") val mediaType: String?,
     val status: String?,
     val synopsis: String?,
-    val mean: Double,
+    val mean: Float?,
     val rank: Int?,
     val popularity: Int?,
     @param:Json(name = "num_list_users") val numberOfListUsers: Int?,

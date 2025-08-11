@@ -1,6 +1,7 @@
 package com.branwen.mal.data.remote
 
 import android.content.SharedPreferences
+import android.util.Log
 import com.branwen.mal.interfaces.MalApi
 import com.branwen.mal.models.domain.MyMangaListItem
 import com.branwen.mal.models.remote.manga.MangaListData
@@ -35,24 +36,32 @@ class MangaRemoteDataSource(
      *         Returns an empty list if the access token is not found or if an error occurs during the API call.
      */
     suspend fun getMangaList(): List<MyMangaListItem> {
-        val fullList = mutableListOf<MangaListData>()
-        var offset = 0
-        val limit = 100
+        try {
+            val fullList = mutableListOf<MangaListData>()
+            var offset = 0
+            val limit = 100
 
-        while (true) {
-            val response = malApi.getUserMangaList(limit = limit, offset = offset)
-            val items = response.data
-            if (items.isEmpty()) break
+            while (true) {
+                val response = malApi.getUserMangaList(limit = limit, offset = offset)
+                val items = response.data
+                if (items.isEmpty()) break
 
-            fullList += items
+                fullList += items
 
-            // If fewer than 100 items were returned, this is the last page.
-            if (items.size < limit) break
+                // If fewer than 100 items were returned, this is the last page.
+                if (items.size < limit) break
 
-            offset += limit
+                offset += limit
+            }
+
+            return fullList
+                .sortedBy { statusOrder[it.listStatus?.status] ?: Int.MAX_VALUE }
+                .toDomain()
+        } catch (e: Exception) {
+            Log.e("MangaRemoteDataSource", "Failed to get manga list ${e.message}")
         }
 
-        return fullList.sortedBy { statusOrder[it.listStatus?.status] ?: Int.MAX_VALUE }.toDomain()
+        return emptyList()
     }
 
     /**

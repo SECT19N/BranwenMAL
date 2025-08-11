@@ -1,5 +1,6 @@
 package com.branwen.mal.data.local
 
+import android.util.Log
 import com.branwen.mal.interfaces.MangaDao
 import com.branwen.mal.models.domain.MyMangaListItem
 import com.branwen.mal.models.entity.MangaListEntity
@@ -12,6 +13,7 @@ class MangaLocalDataSource(
     fun getMangaListFlow(): Flow<List<MyMangaListItem>> =
         dao.getAll()
             .map { entities ->
+                Log.d("MangaLocalDataSource", "getMangaListFlow: ${entities.size}")
                 entities.map { it.toDomain() }
             }
 

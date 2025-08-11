@@ -9,11 +9,13 @@ import com.branwen.mal.models.domain.MyAnimeListItem
 import com.branwen.mal.models.domain.MyMangaListItem
 import com.branwen.mal.utils.launchCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -77,12 +79,18 @@ class MyListViewModel @Inject constructor(
     private fun observeLocal() {
         launchCatching(
             block = {
-                animeRepository.getAnimeListFlow().collect { list ->
-                    _animeList.value = list
-                }
+                coroutineScope {
+                    launch {
+                        animeRepository.getAnimeListFlow().collect { list ->
+                            _animeList.value = list
+                        }
+                    }
 
-                mangaRepository.getMangaListFlow().collect { list ->
-                    _mangaList.value = list
+                    launch {
+                        mangaRepository.getMangaListFlow().collect { list ->
+                            _mangaList.value = list
+                        }
+                    }
                 }
             }
         )

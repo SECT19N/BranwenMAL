@@ -18,7 +18,7 @@ import com.branwen.mal.models.entity.MangaListEntity
  */
 @Database(
     entities = [AnimeListEntity::class, MangaListEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

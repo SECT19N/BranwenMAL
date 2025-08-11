@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import timber.log.Timber
 
 class MangaRepository(
     private val remote: MangaRemoteDataSource,
@@ -14,16 +15,25 @@ class MangaRepository(
 ) {
     fun getMangaListFlow(): Flow<List<MyMangaListItem>> = flow {
         val localFlow = local.getMangaListFlow().firstOrNull()
-        emitAll(local.getMangaListFlow())
 
         if (localFlow.isNullOrEmpty()) {
-            val remoteList = remote.getMangaList()
-            local.saveMangaList(remoteList)
+            try {
+                val remoteList = remote.getMangaList()
+                local.saveMangaList(remoteList)
+            } catch (e: Exception) {
+                Timber.tag("MangaRepository").e("Failed to fetch manga list ${e.message}")
+            }
         }
+
+        emitAll(local.getMangaListFlow())
     }
 
     suspend fun fetchAndCacheMangaList() {
-        val list = remote.getMangaList()
-        local.saveMangaList(list)
+        try {
+            val list = remote.getMangaList()
+            local.saveMangaList(list)
+        } catch (e: Exception) {
+            Timber.tag("MangaRepository").e("Failed to fetch manga list ${e.message}")
+        }
     }
 }
