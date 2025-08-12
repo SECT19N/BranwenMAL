@@ -1,4 +1,4 @@
-package com.branwen.mal.models.domain
+package com.branwen.mal.domain.model
 
 data class MyMangaListItem(
     val id: Int,
