@@ -31,6 +31,7 @@ animationCore = "1.8.3"
 animationGraphics = "1.8.3"
 foundation = "1.8.3"
 runtime = "1.8.3"
+materialIconsExtended = "1.7.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -70,6 +71,7 @@ androidx-animation-core = { group = "androidx.compose.animation", name = "animat
 androidx-animation-graphics = { group = "androidx.compose.animation", name = "animation-graphics", version.ref = "animationGraphics" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 androidx-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

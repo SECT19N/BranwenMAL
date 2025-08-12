@@ -57,6 +57,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.material.icons.extended)
     ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.activity.compose)
@@ -70,7 +71,6 @@ dependencies {
     implementation(libs.androidx.graphics.shapes)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.material)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.room.runtime)
