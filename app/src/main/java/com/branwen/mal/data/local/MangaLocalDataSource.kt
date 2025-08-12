@@ -6,6 +6,7 @@ import com.branwen.mal.models.domain.MyMangaListItem
 import com.branwen.mal.models.entity.MangaListEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 
 class MangaLocalDataSource(
     private val dao: MangaDao
@@ -13,7 +14,6 @@ class MangaLocalDataSource(
     fun getMangaListFlow(): Flow<List<MyMangaListItem>> =
         dao.getAll()
             .map { entities ->
-                Log.d("MangaLocalDataSource", "getMangaListFlow: ${entities.size}")
                 entities.map { it.toDomain() }
             }
 

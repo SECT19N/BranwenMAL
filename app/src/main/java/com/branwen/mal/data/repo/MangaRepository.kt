@@ -13,7 +13,7 @@ class MangaRepository(
     private val remote: MangaRemoteDataSource,
     private val local: MangaLocalDataSource
 ) {
-    fun getMangaListFlow(): Flow<List<MyMangaListItem>> = flow {
+    suspend fun getMangaListFlow(): Flow<List<MyMangaListItem>> = flow {
         val localFlow = local.getMangaListFlow().firstOrNull()
 
         if (localFlow.isNullOrEmpty()) {
@@ -31,6 +31,9 @@ class MangaRepository(
     suspend fun fetchAndCacheMangaList() {
         try {
             val list = remote.getMangaList()
+
+            if (list.isEmpty()) return
+
             local.saveMangaList(list)
         } catch (e: Exception) {
             Timber.tag("MangaRepository").e("Failed to fetch manga list ${e.message}")
