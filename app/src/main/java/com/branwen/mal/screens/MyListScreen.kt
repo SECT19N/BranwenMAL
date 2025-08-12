@@ -21,7 +21,6 @@ import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -59,7 +58,7 @@ fun MyListScreen(
 
     val listState = rememberLazyListState()
 
-    var checkedState by remember { viewModel.listSwitchChecked }
+    var checkedState by viewModel.listSwitchChecked
 
     Column(
         modifier = Modifier.fillMaxSize()

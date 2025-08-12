@@ -24,18 +24,22 @@ class AnimeRepository(
     private val remote: AnimeRemoteDataSource,
     private val local: AnimeLocalDataSource
 ) {
-    fun getAnimeListFlow(): Flow<List<MyAnimeListItem>> = flow {
+    suspend fun getAnimeListFlow(): Flow<List<MyAnimeListItem>> = flow {
         val localFlow = local.getAnimeListFlow().firstOrNull()
-        emitAll(local.getAnimeListFlow()) // always observe local
 
         if (localFlow.isNullOrEmpty()) {
             val remoteList = remote.getAnimeList()
             local.saveAnimeList(remoteList)
         }
+
+        emitAll(local.getAnimeListFlow()) // always observe local
     }
 
     suspend fun fetchAndCacheAnimeList() {
         val list = remote.getAnimeList()
+
+        if (list.isEmpty()) return
+
         local.saveAnimeList(list)
     }
 

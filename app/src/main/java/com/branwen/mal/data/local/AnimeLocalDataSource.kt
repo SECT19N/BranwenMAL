@@ -6,6 +6,7 @@ import com.branwen.mal.models.domain.MyAnimeListItem
 import com.branwen.mal.models.entity.AnimeListEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 
 /**
  * Local data source for anime data.
@@ -28,10 +29,13 @@ class AnimeLocalDataSource(private val dao: AnimeDao) {
      * Save the anime list to the local database
      */
     suspend fun saveAnimeList(list: List<MyAnimeListItem>) {
-        dao.clearAll()
-        dao.insertAll(
-            list = list.map { it.toEntity() }
-        )
+        try {
+            dao.clearAll()
+            val entities = list.map { it.toEntity() }
+            dao.insertAll(entities)
+        } catch (e: Exception) {
+            Timber.tag("AnimeLocalDataSource").e("Failed to save anime list ${e.message}")
+        }
     }
 
     suspend fun updateWatchedEpisodes(id: Int, numEpisodesWatched: Int) {

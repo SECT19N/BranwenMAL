@@ -9,21 +9,16 @@ import com.branwen.mal.models.domain.MyAnimeListItem
 import com.branwen.mal.models.domain.MyMangaListItem
 import com.branwen.mal.utils.launchCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * ViewModel for the My List screen.
- *
- * This ViewModel is responsible for fetching and managing the user's anime list,
- * handling loading and refreshing states, and filtering the list based on status.
- *
- * @property animeRepository The [AnimeRepository] used to fetch anime data.
- */
+
 @HiltViewModel
 class MyListViewModel @Inject constructor(
     private val animeRepository: AnimeRepository,
@@ -77,12 +72,18 @@ class MyListViewModel @Inject constructor(
     private fun observeLocal() {
         launchCatching(
             block = {
-                animeRepository.getAnimeListFlow().collect { list ->
-                    _animeList.value = list
-                }
+                coroutineScope {
+                    launch {
+                        animeRepository.getAnimeListFlow().collect { list ->
+                            _animeList.value = list
+                        }
+                    }
 
-                mangaRepository.getMangaListFlow().collect { list ->
-                    _mangaList.value = list
+                    launch {
+                        mangaRepository.getMangaListFlow().collect { list ->
+                            _mangaList.value = list
+                        }
+                    }
                 }
             }
         )
