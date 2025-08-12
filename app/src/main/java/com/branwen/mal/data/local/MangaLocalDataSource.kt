@@ -1,8 +1,8 @@
 package com.branwen.mal.data.local
 
-import com.branwen.mal.interfaces.MangaDao
-import com.branwen.mal.models.domain.MyMangaListItem
-import com.branwen.mal.models.entity.MangaListEntity
+import com.branwen.mal.data.local.dao.MangaDao
+import com.branwen.mal.data.local.model.MangaListEntity
+import com.branwen.mal.domain.model.MyMangaListItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

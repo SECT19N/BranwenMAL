@@ -1,10 +1,10 @@
-package com.branwen.mal.interfaces
+package com.branwen.mal.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.branwen.mal.models.entity.AnimeListEntity
+import com.branwen.mal.data.local.model.AnimeListEntity
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -28,7 +28,7 @@ interface AnimeDao {
     )
     fun getAll(): Flow<List<AnimeListEntity>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insertAll(list: List<AnimeListEntity>)
 
     @Query("DELETE FROM anime_list")

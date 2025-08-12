@@ -1,11 +1,11 @@
 package com.branwen.mal.data.remote
 
 import android.content.SharedPreferences
-import com.branwen.mal.interfaces.MalApi
-import com.branwen.mal.models.AnimeListItem
-import com.branwen.mal.models.AnimeNode
-import com.branwen.mal.models.domain.MyAnimeListItem
-import com.branwen.mal.models.remote.UpdatedAnimeResponse
+import com.branwen.mal.data.remote.api.MalApi
+import com.branwen.mal.data.remote.dto.anime.AnimeListItem
+import com.branwen.mal.data.remote.dto.anime.AnimeNode
+import com.branwen.mal.data.remote.dto.anime.UpdatedAnimeResponse
+import com.branwen.mal.domain.model.MyAnimeListItem
 
 /**
  * Fetches anime data from the MyAnimeList (MAL) API.

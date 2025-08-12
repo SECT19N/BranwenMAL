@@ -1,10 +1,10 @@
-package com.branwen.mal.interfaces
+package com.branwen.mal.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.branwen.mal.models.entity.MangaListEntity
+import com.branwen.mal.data.local.model.MangaListEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

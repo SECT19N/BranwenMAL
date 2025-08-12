@@ -1,4 +1,4 @@
-package com.branwen.mal.models
+package com.branwen.mal.data.remote.dto
 
 data class AlternativeTitles(
     val synonyms: List<String>? = null,

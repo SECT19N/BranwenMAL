@@ -1,8 +1,6 @@
-package com.branwen.mal.utils
+package com.branwen.mal.data.remote.api
 
-import com.branwen.mal.interfaces.MalApi
-import com.branwen.mal.interfaces.MalAuthService
-import com.branwen.mal.models.TokenResponse
+import com.branwen.mal.data.remote.dto.TokenResponse
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient

@@ -1,5 +1,9 @@
-package com.branwen.mal.models
+package com.branwen.mal.data.remote.dto.anime
 
+import com.branwen.mal.data.remote.dto.AlternativeTitles
+import com.branwen.mal.data.remote.dto.Genre
+import com.branwen.mal.data.remote.dto.Paging
+import com.branwen.mal.data.remote.dto.PictureSource
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 

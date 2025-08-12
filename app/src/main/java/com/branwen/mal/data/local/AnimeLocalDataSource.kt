@@ -1,9 +1,10 @@
 package com.branwen.mal.data.local
 
-import com.branwen.mal.interfaces.AnimeDao
-import com.branwen.mal.models.AnimeNode
-import com.branwen.mal.models.domain.MyAnimeListItem
-import com.branwen.mal.models.entity.AnimeListEntity
+import com.branwen.mal.data.local.dao.AnimeDao
+import com.branwen.mal.data.mapper.AnimeListEntityMapper.toDomain
+import com.branwen.mal.data.mapper.MyAnimeListItemMapper.toEntity
+import com.branwen.mal.data.remote.dto.anime.AnimeNode
+import com.branwen.mal.domain.model.MyAnimeListItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
@@ -44,34 +45,4 @@ class AnimeLocalDataSource(private val dao: AnimeDao) {
 
     suspend fun getAnimeDetails(animeId: Int): AnimeNode? = null
     suspend fun saveAnimeDetails(node: AnimeNode) = Unit
-
-    /**
-     * Convert a [AnimeListEntity] to a [MyAnimeListItem]
-     */
-    private fun AnimeListEntity.toDomain() = MyAnimeListItem(
-        id = id,
-        title = title,
-        status = status,
-        imageUrl = imageUrl,
-        startSeason = startSeason,
-        startYear = startYear,
-        numEpisodesWatched = numEpisodesWatched,
-        totalEpisodes = totalEpisodes,
-        rating = rating
-    )
-
-    /**
-     * Convert a [MyAnimeListItem] to a [AnimeListEntity]
-     */
-    private fun MyAnimeListItem.toEntity() = AnimeListEntity(
-        id = id,
-        title = title,
-        status = status,
-        imageUrl = imageUrl,
-        startSeason = startSeason,
-        startYear = startYear,
-        numEpisodesWatched = numEpisodesWatched,
-        totalEpisodes = totalEpisodes,
-        rating = rating
-    )
 }

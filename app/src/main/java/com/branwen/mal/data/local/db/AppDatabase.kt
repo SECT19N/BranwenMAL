@@ -1,11 +1,11 @@
-package com.branwen.mal.models
+package com.branwen.mal.data.local.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.branwen.mal.interfaces.AnimeDao
-import com.branwen.mal.interfaces.MangaDao
-import com.branwen.mal.models.entity.AnimeListEntity
-import com.branwen.mal.models.entity.MangaListEntity
+import com.branwen.mal.data.local.dao.AnimeDao
+import com.branwen.mal.data.local.dao.MangaDao
+import com.branwen.mal.data.local.model.AnimeListEntity
+import com.branwen.mal.data.local.model.MangaListEntity
 
 /**
  * Room database for the application.

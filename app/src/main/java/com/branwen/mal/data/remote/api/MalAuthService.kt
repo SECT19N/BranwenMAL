@@ -1,6 +1,6 @@
-package com.branwen.mal.interfaces
+package com.branwen.mal.data.remote.api
 
-import com.branwen.mal.models.TokenResponse
+import com.branwen.mal.data.remote.dto.TokenResponse
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded

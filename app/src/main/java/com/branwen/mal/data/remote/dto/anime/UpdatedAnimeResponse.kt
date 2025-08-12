@@ -1,4 +1,4 @@
-package com.branwen.mal.models.remote
+package com.branwen.mal.data.remote.dto.anime
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

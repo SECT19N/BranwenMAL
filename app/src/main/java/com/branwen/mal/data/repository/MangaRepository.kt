@@ -1,18 +1,20 @@
-package com.branwen.mal.data.repo
+package com.branwen.mal.data.repository
 
 import com.branwen.mal.data.local.MangaLocalDataSource
 import com.branwen.mal.data.remote.MangaRemoteDataSource
-import com.branwen.mal.models.domain.MyMangaListItem
+import com.branwen.mal.domain.model.MyMangaListItem
+import com.branwen.mal.domain.repository.IMangaRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
+import javax.inject.Inject
 
-class MangaRepository(
+class MangaRepository @Inject constructor(
     private val remote: MangaRemoteDataSource,
     private val local: MangaLocalDataSource
-) {
+) : IMangaRepository {
     /**
      * Retrieves a flow of the user's manga list.
      *
@@ -27,7 +29,7 @@ class MangaRepository(
      *
      * @return A [Flow] of [List] of [MyMangaListItem] representing the user's manga list.
      */
-    fun getMangaListFlow(): Flow<List<MyMangaListItem>> = flow {
+    override suspend fun getMangaListCache(): Flow<List<MyMangaListItem>> = flow {
         val localFlow = local.getMangaListFlow().firstOrNull()
 
         if (localFlow.isNullOrEmpty()) {
@@ -50,7 +52,7 @@ class MangaRepository(
      * to the local data source.
      * If an error occurs during the fetch operation, an error message is logged.
      */
-    suspend fun fetchAndCacheMangaList() {
+    override suspend fun fetchAndCacheMangaList() {
         try {
             val list = remote.getMangaList()
 

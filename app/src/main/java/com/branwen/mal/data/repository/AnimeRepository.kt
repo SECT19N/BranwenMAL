@@ -1,14 +1,16 @@
-package com.branwen.mal.data.repo
+package com.branwen.mal.data.repository
 
 import com.branwen.mal.data.local.AnimeLocalDataSource
 import com.branwen.mal.data.remote.AnimeRemoteDataSource
-import com.branwen.mal.models.AnimeNode
-import com.branwen.mal.models.domain.MyAnimeListItem
+import com.branwen.mal.data.remote.dto.anime.AnimeNode
+import com.branwen.mal.domain.model.MyAnimeListItem
+import com.branwen.mal.domain.repository.IAnimeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Repository for handling anime data, acting as a single source of truth.
@@ -20,11 +22,11 @@ import timber.log.Timber
  * @param remote The remote data source for fetching anime data from an external API.
  * @param local The local data source for storing and retrieving cached anime data.
  */
-class AnimeRepository(
+class AnimeRepository @Inject constructor(
     private val remote: AnimeRemoteDataSource,
     private val local: AnimeLocalDataSource
-) {
-    suspend fun getAnimeListFlow(): Flow<List<MyAnimeListItem>> = flow {
+) : IAnimeRepository {
+    override suspend fun getAnimeListCache(): Flow<List<MyAnimeListItem>> = flow {
         val localFlow = local.getAnimeListFlow().firstOrNull()
 
         if (localFlow.isNullOrEmpty()) {
@@ -35,7 +37,7 @@ class AnimeRepository(
         emitAll(local.getAnimeListFlow()) // always observe local
     }
 
-    suspend fun fetchAndCacheAnimeList() {
+    override suspend fun fetchAndCacheAnimeList() {
         val list = remote.getAnimeList()
 
         if (list.isEmpty()) return

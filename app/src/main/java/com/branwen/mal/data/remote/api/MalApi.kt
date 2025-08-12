@@ -1,10 +1,10 @@
-package com.branwen.mal.interfaces
+package com.branwen.mal.data.remote.api
 
-import com.branwen.mal.models.AnimeListResponse
-import com.branwen.mal.models.AnimeNode
-import com.branwen.mal.models.ListStatus
-import com.branwen.mal.models.remote.UpdatedAnimeResponse
-import com.branwen.mal.models.remote.manga.MangaListResponse
+import com.branwen.mal.data.remote.dto.anime.AnimeListResponse
+import com.branwen.mal.data.remote.dto.anime.AnimeNode
+import com.branwen.mal.data.remote.dto.anime.ListStatus
+import com.branwen.mal.data.remote.dto.anime.UpdatedAnimeResponse
+import com.branwen.mal.data.remote.dto.manga.MangaListResponse
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET

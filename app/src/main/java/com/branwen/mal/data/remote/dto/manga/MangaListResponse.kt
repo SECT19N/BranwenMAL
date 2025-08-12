@@ -1,10 +1,10 @@
-package com.branwen.mal.models.remote.manga
+package com.branwen.mal.data.remote.dto.manga
 
-import com.branwen.mal.models.AlternativeTitles
-import com.branwen.mal.models.AnimeListItem
-import com.branwen.mal.models.Genre
-import com.branwen.mal.models.Paging
-import com.branwen.mal.models.PictureSource
+import com.branwen.mal.data.remote.dto.AlternativeTitles
+import com.branwen.mal.data.remote.dto.Genre
+import com.branwen.mal.data.remote.dto.Paging
+import com.branwen.mal.data.remote.dto.PictureSource
+import com.branwen.mal.data.remote.dto.anime.AnimeListItem
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 

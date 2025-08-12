@@ -1,9 +1,9 @@
 package com.branwen.mal.data.remote
 
 import android.content.SharedPreferences
-import com.branwen.mal.interfaces.MalApi
-import com.branwen.mal.models.domain.MyMangaListItem
-import com.branwen.mal.models.remote.manga.MangaListData
+import com.branwen.mal.data.remote.api.MalApi
+import com.branwen.mal.data.remote.dto.manga.MangaListData
+import com.branwen.mal.domain.model.MyMangaListItem
 import timber.log.Timber
 
 /**
