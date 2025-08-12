@@ -10,10 +10,10 @@ import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.branwen.mal.ui.theme.BranwenMALTheme
-import com.branwen.mal.utils.AppNavigation
-import com.branwen.mal.utils.MalServiceBuilder.provideAuthService
-import com.branwen.mal.utils.PKCE
+import com.branwen.mal.data.remote.api.MalServiceBuilder.provideAuthService
+import com.branwen.mal.presentation.navigation.AppNavigation
+import com.branwen.mal.presentation.ui.PKCE
+import com.branwen.mal.presentation.ui.theme.BranwenMALTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
