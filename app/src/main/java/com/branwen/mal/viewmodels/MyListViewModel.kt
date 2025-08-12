@@ -18,14 +18,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * ViewModel for the My List screen.
- *
- * This ViewModel is responsible for fetching and managing the user's anime list,
- * handling loading and refreshing states, and filtering the list based on status.
- *
- * @property animeRepository The [AnimeRepository] used to fetch anime data.
- */
+
 @HiltViewModel
 class MyListViewModel @Inject constructor(
     private val animeRepository: AnimeRepository,

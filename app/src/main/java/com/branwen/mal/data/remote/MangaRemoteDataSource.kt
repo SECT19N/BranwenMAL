@@ -1,7 +1,6 @@
 package com.branwen.mal.data.remote
 
 import android.content.SharedPreferences
-import android.util.Log
 import com.branwen.mal.interfaces.MalApi
 import com.branwen.mal.models.domain.MyMangaListItem
 import com.branwen.mal.models.remote.manga.MangaListData
